@@ -1,0 +1,18 @@
+{
+  "manifest_version": 3,
+  "name": "Equality Compass",
+  "version": "1.0",
+  "description": "Colors job posting states based on the score assigned by the Movement Advancement Project.",
+  "permissions": ["activeTab", "scripting"],
+  "content_scripts": [
+    {
+      "matches": ["*://*.linkedin.com/jobs*"],
+      "js": ["stateScores.js", "content.js"],
+      "css": ["styles.css"]
+    }
+  ],
+  "host_permissions": ["<all_urls>"],
+  "action": {
+    "default_title": "Equality Compass"
+  }
+}
