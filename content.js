@@ -83,6 +83,8 @@ observer.observe(document.body, { childList: true, subtree: true });
 document.addEventListener("visibilitychange", () => {
   if (document.visibilityState === "visible") {
     highlightStates();
+    stableCount = 0;
+    observer.observe(document.body, { childList: true, subtree: true });
   }
 });
 
