@@ -7,93 +7,127 @@
  * If you are transgender, especially a transgender woman of color, please consider high and medium policy
  * areas only for your safety if possible.
  */
+ 
+console.log("[LinkedIn Colorizer] Content script loaded");
 
-// Merge full state names and abbreviations into a single lookup object
-function resolveScores() {
-  const scores = { ...window.fullStateScores }; // "..." Shallow copy
-  for (const [abbr, fullName] of Object.entries(window.stateAbbreviations)) {
-    if (window.fullStateScores[fullName] !== undefined) {
-      scores[abbr] = window.fullStateScores[fullName];
-    }
-  }
-  return scores;
-}
-
-const stateScores = resolveScores();
-const states = Object.keys(stateScores).sort((a, b) => b.length - a.length);
-const regex = new RegExp(`\\b(${states.join("|")})\\b`, "g");
-
-// Determine the color for a given score based on the policy tally
-function getColor(score) {
-  if (score >= 36.75) return 'DarkGreen';        // High policy tally
-  if (score >= 24.5) return 'DarkSeaGreen';      // Medium policy tally
-  if (score >= 12.25) return 'DarkKhaki';        // Fair policy tally
-  if (score >= 0) return 'Coral';                // Low policy tally
-  return 'FireBrick';                            // Negative policy tally
-}
-
-// Cache to avoid reprocessing already-highlighted text nodes
-const processedNodes = new WeakSet();
-
-
-// Highlight all matching state names on the page
-function highlightStates() {
-  let changes = 0;
-  document.querySelectorAll("*:not(script):not(style)").forEach(el => {
-    if (el.children.length === 0 && regex.test(el.textContent)) {
-      el.innerHTML = el.textContent.replace(regex, match => {
-        const score = stateScores[match];
-        const color = getColor(score);
-        changes++;
-        return `<span style=\"color:${color}; font-weight:bold;\" title=\"Score: ${score}\">${match}</span>`;
-      });
-    }
-  });
-  return changes;
-}
-
-// Throttle highlighting to reduce performance impact
-let mutationTimeout = null;
-let stableCount = 0; // How many scans with no new highlights we have
-const MAX_STABLE = 3; // Stop highlighting after this many scans produce no new highlights
-
-const throttledHighlightStates = () => {
-  if (mutationTimeout !== null) return;
-  mutationTimeout = setTimeout(() => {
-    mutationTimeout = null;
-    if (document.visibilityState !== "visible") return; // skip if not visible
-    const changes = highlightStates();
-    if (changes === 0) {
-      stableCount++;
-      if (stableCount >= MAX_STABLE) {
-        observer.disconnect();
-        console.log("Equality Listing: Observer disconnected (DOM stable).");
-      }
-    } else {
-      stableCount = 0;
-    }
-  }, 500);
-};
-
-// Monitor DOM for job card changes
-const observer = new MutationObserver(throttledHighlightStates);
-observer.observe(document.body, { childList: true, subtree: true });
-
-// Handle tab visibility changes to avoid background work
-document.addEventListener("visibilitychange", () => {
-  if (document.visibilityState === "visible") {
-    highlightStates();
-    stableCount = 0;
-    observer.observe(document.body, { childList: true, subtree: true });
+browser.runtime.onMessage.addListener((msg) => {
+  if (msg.type === "modeChanged") {
+    console.log("[LinkedIn Colorizer] Mode changed — reprocessing all visible spans");
+    document.querySelectorAll('[data-processed="true"]').forEach(el => {
+      el.removeAttribute("data-processed");
+    });
+    applyColoring();
   }
 });
 
-// Run initially and on idle
-if ("requestIdleCallback" in window) {
-  requestIdleCallback(() => highlightStates(), { timeout: 2000 });
-} else {
-  window.addEventListener("load", () => {
-    highlightStates();
-    setTimeout(() => highlightStates(), 2000);
-  });
+// Run coloring immediately in case content is already there
+applyColoring();
+
+// Start a global observer that tracks the entire page for changes
+const observer = new MutationObserver((mutations) => {
+  for (const mutation of mutations) {
+    for (const node of mutation.addedNodes) {
+      if (!(node instanceof HTMLElement)) continue;
+
+      // Check for any new location span matching our selector
+      const spans = node.matches?.('span[dir="ltr"]')
+        ? [node]
+        : node.querySelectorAll?.('span[dir="ltr"]') || [];
+
+      spans.forEach(span => {
+        const parent = span.closest('.artdeco-entity-lockup__caption');
+        if (parent && !span.dataset.processed) {
+          span.dataset.processed = "true";
+          processSpan(span);
+        }
+      });
+    }
+  }
+});
+
+// Watch the entire body — yes, broader, but works reliably across LinkedIn's SPA behavior
+observer.observe(document.body, {
+  childList: true,
+  subtree: true
+});
+
+
+// Initial full scan of all listings
+async function applyColoring() {
+  const spans = document.querySelectorAll('.artdeco-entity-lockup__caption span[dir="ltr"]');
+  for (const span of spans) {
+    if (!span.dataset.processed) {
+      span.dataset.processed = "true";
+      await processSpan(span);
+    }
+  }
+}
+
+// Highlights a single span based on current mode
+async function processSpan(span) {
+  const { mode = "Primary" } = await browser.storage.local.get("mode");
+
+  const stateScores = {
+    Primary: {
+      "California": "#FFCCCC",
+	  "CA": "#FFCCCC",
+      "Texas": "#CCE5FF",
+	  "TX": "#CCE5FF"
+      // ... your full list
+    },
+    Secondary: {
+      "California": "#CCCCFF",
+	  "CA": "#CCCCFF",
+      "Texas": "#00E5CC",
+	  "TX": "#00E5CC"
+      // ... your alternate list
+    }
+  };
+
+  const colors = stateScores[mode];
+  const originalText = span.dataset.originalText || span.textContent.trim();
+  span.dataset.originalText = originalText;
+
+  const parenIndex = originalText.indexOf(" (");
+  const trailing = parenIndex !== -1 ? originalText.slice(parenIndex) : "";
+  const locationPart = parenIndex !== -1 ? originalText.slice(0, parenIndex) : originalText;
+  const parts = locationPart.split(",").map(p => p.trim());
+
+  let city = null;
+  let stateCandidate = null;
+
+  if (parts.length === 3) {
+    city = parts[0];
+    stateCandidate = parts[1];
+  } else if (parts.length === 2) {
+    if (parts[1] === "United States") {
+      city = null;
+      stateCandidate = parts[0];
+    } else {
+      city = parts[0];
+      stateCandidate = parts[1];
+    }
+  } else {
+    return;
+  }
+
+  const color = colors[stateCandidate] || colors[stateCandidate.toUpperCase()];
+  if (!color) return;
+
+  span.textContent = "";
+
+  if (city) {
+    span.appendChild(document.createTextNode(city + ", "));
+  }
+
+  const stateSpan = document.createElement("span");
+  stateSpan.textContent = stateCandidate;
+  stateSpan.style.backgroundColor = color;
+  stateSpan.style.borderRadius = "3px";
+  stateSpan.style.padding = "0 2px";
+  span.appendChild(stateSpan);
+
+  if (trailing) {
+    span.appendChild(document.createTextNode(trailing));
+  }
 }
