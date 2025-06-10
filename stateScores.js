@@ -458,7 +458,7 @@ window.fullStateScores = {
 // ---------- // ---------- // ---------- // ---------- //
 
 
-window.stateAbbreviations = {
+window.genderIdentityStateScores = {
   "Alabama": {
     "color": "rgba(178, 34, 34, 0.5)",
     "score": -7.75
