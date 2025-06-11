@@ -1,97 +1,102 @@
+<!--
+Front end logic for the addon's "popup" or "addon" tab when the icon is clicked.
+Front end calls the backend, popup.js, to store and transmit information to the addon.
+ --> 
+
 <!DOCTYPE html>
 <html>
 <head>
-  <style>
-    body {
-      font-family: sans-serif;
-      padding: 12px;
-      width: 240px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
+	<style> 
+	body {
+	  font-family: sans-serif;
+	  padding: 12px;
+	  width: 240px;
+	  display: flex;
+	  flex-direction: column;
+	  gap: 12px;
+	}
 
-    .header {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
+	.header {
+	  display: flex;
+	  align-items: center;
+	  gap: 8px;
+	}
 
-    .header img {
-      width: 24px;
-      height: 24px;
-    }
+	.header img {
+	  width: 24px;
+	  height: 24px;
+	}
 
-    .header-title {
-      font-weight: bold;
-      font-size: 16px;
-    }
+	.header-title {
+	  font-weight: bold;
+	  font-size: 16px;
+	}
 
-    .switch-container {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
+	.switch-container {
+	  display: flex;
+	  align-items: center;
+	  justify-content: space-between;
+	}
 
-    .switch-label {
-      margin-right: 10px;
-      font-size: 14px;
-    }
+	.switch-label {
+	  margin-right: 10px;
+	  font-size: 14px;
+	}
 
-    .switch {
-      position: relative;
-      display: inline-block;
-      width: 42px;
-      height: 24px;
-    }
+	.switch {
+	  position: relative;
+	  display: inline-block;
+	  width: 42px;
+	  height: 24px;
+	}
 
-    .switch input {
-      opacity: 0;
-      width: 0;
-      height: 0;
-    }
+	.switch input {
+	  opacity: 0;
+	  width: 0;
+	  height: 0;
+	}
 
-    .slider {
-      position: absolute;
-      cursor: pointer;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background-color: #ccc;
-      transition: 0.4s;
-      border-radius: 24px;
-    }
+	.slider {
+	  position: absolute;
+	  cursor: pointer;
+	  top: 0; left: 0; right: 0; bottom: 0;
+	  background-color: #ccc;
+	  transition: 0.4s;
+	  border-radius: 24px;
+	}
 
-    .slider:before {
-      position: absolute;
-      content: "";
-      height: 18px;
-      width: 18px;
-      left: 3px;
-      bottom: 3px;
-      background-color: white;
-      transition: 0.4s;
-      border-radius: 50%;
-    }
+	.slider:before {
+	  position: absolute;
+	  content: "";
+	  height: 18px;
+	  width: 18px;
+	  left: 3px;
+	  bottom: 3px;
+	  background-color: white;
+	  transition: 0.4s;
+	  border-radius: 50%;
+	}
 
-    input:checked + .slider {
-      background-color: #4CAF50;
-    }
+	input:checked + .slider {
+	  background-color: #4CAF50;
+	}
 
-    input:checked + .slider:before {
-      transform: translateX(18px);
-    }
+	input:checked + .slider:before {
+	  transform: translateX(18px);
+	}
 
-    .footer {
-      font-size: 12px;
-    }
+	.footer {
+	  font-size: 12px;
+	}
 
-    .footer a {
-      color: #0073b1;
-      text-decoration: none;
-    }
+	.footer a {
+	  color: #0073b1;
+	  text-decoration: none;
+	}
 
-    .footer a:hover {
-      text-decoration: underline;
-    }
+	.footer a:hover {
+	  text-decoration: underline;
+	}
 		
 	.legend {
 	  display: flex;
@@ -121,38 +126,48 @@
 	  line-height: 20px;
 	  cursor: default;
 	}
-  </style>
+	</style>
 </head>
-<body>
-  <div class="header">
-    <img src="icon.png" alt="Icon">
-    <span class="header-title">Equality Compass</span>
-  </div>
 
-  <div class="switch-container">
-    <span class="switch-label">Gender Identity Mode</span>
-    <label class="switch">
-      <input type="checkbox" id="modeToggle">
-      <span class="slider"></span>
-    </label>
-  </div>
+<body>
+	<div class="header">
+		<img src="icon.png" alt="Icon">
+		<span class="header-title">Equality Compass</span>
+	</div>
+
+	<div class="switch-container">
+		<span class="switch-label">Gender Identity Mode</span>
+		<label class="switch">
+			<input type="checkbox" id="modeToggle">
+			<span class="slider"></span>
+		</label>
+	</div>
   
-  <div class="legend">
-  <div class="legend-title">Color Legend (Policy Score)</div>
-  <div class="legend-row">
-    <div class="legend-item" style="background-color: DarkGreen;" title="&ge; 36.75">High</div>
-    <div class="legend-item" style="background-color: DarkSeaGreen;" title="&ge; 24.5">Medium</div>
-    <div class="legend-item" style="background-color: DarkKhaki;" title="&ge; 12.25">Fair</div>
-    <div class="legend-item" style="background-color: Coral;" title="&ge; 0">Low</div>
-    <div class="legend-item" style="background-color: FireBrick;" title="&lt; 0">Negative</div>
-  </div>
+	<div class="switch-container">
+		<span class="switch-label">Show Tooltips</span>
+		<label class="switch">
+			<input type="checkbox" id="tooltipToggle">
+			<span class="slider"></span>
+		</label>
+	</div>
+
+  
+	<div class="legend">
+	<div class="legend-title">Color Legend (Policy Score)</div>
+	<div class="legend-row">
+		<div class="legend-item" style="background-color: DarkGreen;" title="&ge; 36.75">High</div>
+		<div class="legend-item" style="background-color: DarkSeaGreen;" title="&ge; 24.5">Medium</div>
+		<div class="legend-item" style="background-color: DarkKhaki;" title="&ge; 12.25">Fair</div>
+		<div class="legend-item" style="background-color: Coral;" title="&ge; 0">Low</div>
+		<div class="legend-item" style="background-color: FireBrick;" title="&lt; 0">Negative</div>
+	</div>
 </div>
 
 
-  <div class="footer">
-    Data source: <a href="https://www.mapresearch.org/equality-maps/equality-maps" target="_blank">Movement Advancement Project (MAP)</a>
-  </div>
+	<div class="footer">
+	Data source: <a href="https://www.mapresearch.org/equality-maps/equality-maps" target="_blank">Movement Advancement Project (MAP)</a>
+	</div>
 
-  <script src="popup.js"></script>
+	<script src="popup.js"></script>
 </body>
 </html>

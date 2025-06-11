@@ -13,21 +13,27 @@
  *
  */
  
-console.log("[LinkedIn Colorizer] Content script loaded");
+console.log("[Equality Compass] Content script loaded");
 
 /**
- * Listen for messages from the popup to reprocess listings
- * when the user switches between Primary/Secondary mode.
+ * Listen for messages from the popup to reprocess listings when the user changes addon settings.
+ * Settings: Primary/GI mode, Tooltips on/off.
  */
 browser.runtime.onMessage.addListener((msg) => {
-  if (msg.type === "modeChanged") {
-	console.log("[LinkedIn Colorizer] Mode changed — reprocessing all visible spans");
-	// Unmark all previously processed spans
-	document.querySelectorAll('[data-processed="true"]').forEach(el => {
-	  el.removeAttribute("data-processed");
-	});
-	applyColoring(); // Recolor all current listings with new mode
-  }
+	if (msg.type === "modeChanged") {
+		console.log("[Equality Compass] Mode changed — reprocessing all visible spans");
+		// Unmark all previously processed spans
+		document.querySelectorAll('[data-processed="true"]').forEach(el => {
+			el.removeAttribute("data-processed");
+		});
+		applyColoring(); // Recolor all current listings with new mode
+	} else if (msg.type === "tooltipChanged"){
+		console.log("[Equality Compass] Tooltips changed — reprocessing all visible spans");
+		document.querySelectorAll('[data-processed="true"]').forEach(el => {
+			el.removeAttribute("data-processed");
+		});
+		applyColoring(); // Recolor all current listings with new mode
+	}
 });
 
 // Initial application in case listings already exist on page load
@@ -86,7 +92,7 @@ async function applyColoring() {
  * @param {HTMLElement} span - the span to modify (must contain location text)
  */
 async function processSpan(span) {
-	const { mode = "Primary" } = await browser.storage.local.get("mode");
+	const { mode = "Primary", tooltipsEnabled = true } = await browser.storage.local.get(["mode", "tooltipsEnabled"]);
 
 	const stateScores = {
 	// Minified versions. Human readable format is in stateScores.js.
@@ -150,7 +156,14 @@ async function processSpan(span) {
 	stateSpan.style.color = "white";
 	stateSpan.style.outline = "1px solid black"
 	span.appendChild(stateSpan);
-	stateSpan.title = `${stateCandidate} — MAP score: ${score.toFixed(2)}`;
+	// Tooltips section
+	if (tooltipsEnabled) { // Add a tooltip if enabled (default)
+		const tooltipText = `${stateCandidate} — MAP score: ${score.toFixed(2)}`;
+		stateSpan.title = tooltipText;
+		stateSpan.dataset.tooltipContent = tooltipText;
+		stateSpan.dataset.tooltipApplied = "true";
+		console.log("[Equality Compass] Processing tooltip " + tooltipText);
+	}
 
 	// Add any remaining trailing info
 	if (trailing) {
