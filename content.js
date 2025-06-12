@@ -17,7 +17,7 @@ console.log("[Equality Compass] Content script loaded");
 
 /**
  * Listen for messages from the popup to reprocess listings when the user changes addon settings.
- * Settings: Primary/GI mode, Tooltips on/off.
+ * Settings: Primary/Gender Identity mode, Tooltips on/off.
  */
 browser.runtime.onMessage.addListener((msg) => {
 	if (msg.type === "modeChanged") {
@@ -26,18 +26,47 @@ browser.runtime.onMessage.addListener((msg) => {
 		document.querySelectorAll('[data-processed="true"]').forEach(el => {
 			el.removeAttribute("data-processed");
 		});
-		applyColoring(); // Recolor all current listings with new mode
+		// Recolor all current listings with new mode
+		if (window.location.href.includes("linkedin")){
+			applyColoring(); 
+		}
+		else if (window.location.href.includes("indeed")){
+			applyIndeedColoring();
+		}
 	} else if (msg.type === "tooltipChanged"){
 		console.log("[Equality Compass] Tooltips changed — reprocessing all visible spans");
 		document.querySelectorAll('[data-processed="true"]').forEach(el => {
 			el.removeAttribute("data-processed");
 		});
-		applyColoring(); // Recolor all current listings with new mode
+		// Recolor all current listings with new mode
+		if (window.location.href.includes("linkedin")){
+			applyColoring(); 
+		}
+		else if (window.location.href.includes("indeed")){
+			applyIndeedColoring();
+		}
 	}
 });
 
-// Initial application in case listings already exist on page load
-applyColoring();
+
+// 
+/**
+ * Initial application in case listings already exist on page load.
+ * Checks against which website is currently in use.
+ * For Indeed, runs the coloring function multiple times due to strange async loading.
+ */
+if (window.location.href.includes("linkedin")){
+	applyColoring(); 
+}
+else if (window.location.hostname.includes("indeed.com")) {
+	// Two second
+	for (var i = 1; i < 5; i++) { // Run this 5 times
+		setTimeout(function(){
+			applyIndeedColoring();
+		}, 2000 * i); // Fires at 2s, 4s, 6s, 8s, 10s.
+	}
+}
+
 
 /**
  * Persistent MutationObserver that handles all dynamic LinkedIn changes.
@@ -45,6 +74,10 @@ applyColoring();
  * This is reliable on LinkedIn's SPA behavior.
  */
 const observer = new MutationObserver((mutations) => {
+	if (!window.location.href.includes("linkedin")) { // NOT LinkedIn
+		observer.disconnect(); // Turn the observer off
+		console.log("[Equality Compass] Disconnecting LinkedIn Observer");
+	}
 	for (const mutation of mutations) {
 		for (const node of mutation.addedNodes) {
 			if (!(node instanceof HTMLElement)) continue; // Skip non-element nodes
@@ -65,6 +98,18 @@ const observer = new MutationObserver((mutations) => {
 		}
 	}
 });
+
+function applyIndeedColoring() {
+  const locationSpans = document.querySelectorAll('div[data-testid="text-location"]');
+
+  locationSpans.forEach(span => {
+    if (!span.dataset.processed) {
+      span.dataset.processed = "true";
+      processSpan(span);
+    }
+  });
+}
+
 
 // Begin observing the entire body for dynamically injected listings
 observer.observe(document.body, {
@@ -128,11 +173,11 @@ async function processSpan(span) {
 			stateCandidate = parts[1];
 		}
 	} else {
-		return; // Unknown format, skip
+		city = null;
+		stateCandidate = parts[0];
+		//return; // Unknown format, skip
 	}
 	
-	// TODO: Replace const color with a tuple version - prereq, tuple data structure
-	// REPLACE WITH THIS:
 	const entry =
 		colors[stateCandidate] || colors[stateCandidate.toUpperCase()];
 	if (!entry) return; // Not a match for any known state/territory
