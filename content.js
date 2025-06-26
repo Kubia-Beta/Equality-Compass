@@ -159,23 +159,39 @@ async function processSpan(span) {
 
 	let city = null;
 	let stateCandidate = null;
+	
 
 	// Handle formats: City, State or State, United States or City, State, United States
 	if (parts.length === 3) {
-		city = parts[0];
-		stateCandidate = parts[1];
-	} else if (parts.length === 2) {
-		if (parts[1] === "United States") {
+		// ex. Remote in, Remote from, etc.
+		if (parts[0] === "Remote") { 
 			city = null;
-			stateCandidate = parts[0];
-		} else {
+			stateCandidate = parts [2]
+		} else { // Phoenix, AZ, U.S.
 			city = parts[0];
 			stateCandidate = parts[1];
 		}
+		
+	} else if (parts.length === 2) {
+		if (parts[1] === "United States"
+			|| parts[1] === "US"
+			|| parts[1] === "U.S.") 
+			{ // ex. Nevada, United States
+			city = null;
+			stateCandidate = parts[0];
+		} else if (/\d/.test(parts[1])){ // elif for city, state zip (no comma)
+			// copy parts into a String
+			temp = parts[1];
+			// split string by digit /\d\
+			// push digit element to end as parts [2]
+			// assign alpha as parts [1]
+		} else { // ex. Phoenix, Arizona
+			city = parts[0];
+			stateCandidate = parts[1];
+		} 
 	} else {
 		city = null;
 		stateCandidate = parts[0];
-		//return; // Unknown format, skip
 	}
 	
 	const entry =
