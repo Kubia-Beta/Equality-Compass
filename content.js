@@ -185,6 +185,7 @@ async function processSpan(span) {
 			// split string by digit /\d\
 			// push digit element to end as parts [2]
 			// assign alpha as parts [1]
+			// Does this mean I have to change it from const parts? Might have to.
 		} else { // ex. Phoenix, Arizona
 			city = parts[0];
 			stateCandidate = parts[1];
