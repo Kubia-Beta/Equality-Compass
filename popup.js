@@ -25,7 +25,7 @@ toggle.addEventListener("change", () => {
 });
 
 
-// Tooltip Toggle //
+// Tooltip Toggle
 const tooltipToggle = document.getElementById("tooltipToggle");
 
 // Load saved setting from storage
