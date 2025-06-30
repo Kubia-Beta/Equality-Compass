@@ -3,7 +3,7 @@
  * Stores and retrieves relevent addon settings and pushes those settings to content.js.
  */
 
-// Gender Identity Toggle //
+// Gender Identity Toggle
 const toggle = document.getElementById("modeToggle");
 
 // Load saved setting from storage
@@ -25,7 +25,7 @@ toggle.addEventListener("change", () => {
 });
 
 
-// Tooltip Toggle //
+// Tooltip Toggle
 const tooltipToggle = document.getElementById("tooltipToggle");
 
 // Load saved setting from storage
