@@ -1,457 +1,465 @@
-// Here are the state scores in a human readable format used by content.js.
+// Here are the state scores and policy colors in a human readable format used by content.js.
 // Primary is the initial state, and is the overall state score determined by MAP.
 // Secondary is the Gender Identiy score, and is determined by MAP.
 // Minified using https://minify-js.com/
+
+const policyColors = {
+	"high": "rgba(0, 100, 0, 0.5)",
+	"medium": "rgba(143, 188, 143, 0.75)",
+	"fair": "rgba(189, 183, 107, 0.75)",
+	"low": "rgba(255, 127, 80, 0.65)",
+	"negative": "rgba(178, 34, 34, 0.5)"
+}
 
 
 const stateScores = {
 	Primary = {
 	  "Alabama": {
-		"color": "rgba(178, 34, 34, 0.5)",
+		"colorGrade": "negative",
 		"score": -10.5
 	  },
 	  "Alaska": {
-		"color": "rgba(255, 127, 80, 0.65)",
+		"colorGrade": "low",
 		"score": 8.25
 	  },
 	  "American Samoa": {
-		"color": "rgba(255, 127, 80, 0.65)",
+		"colorGrade": "low",
 		"score": 0.0
 	  },
 	  "Arizona": {
-		"color": "rgba(255, 127, 80, 0.65)",
+		"colorGrade": "low",
 		"score": 7.5
 	  },
 	  "Arkansas": {
-		"color": "rgba(178, 34, 34, 0.5)",
+		"colorGrade": "negative",
 		"score": -12.25
 	  },
 	  "California": {
-		"color": "rgba(0, 100, 0, 0.5)",
+		"colorGrade": "high",
 		"score": 45.0
 	  },
 	  "Colorado": {
-		"color": "rgba(0, 100, 0, 0.5)",
+		"colorGrade": "high",
 		"score": 45.25
 	  },
 	  "Connecticut": {
-		"color": "rgba(0, 100, 0, 0.5)",
+		"colorGrade": "high",
 		"score": 40.75
 	  },
 	  "Delaware": {
-		"color": "rgba(143, 188, 143, 0.75)",
+		"colorGrade": "medium",
 		"score": 30.25
 	  },
 	  "District of Columbia": {
-		"color": "rgba(0, 100, 0, 0.5)",
+		"colorGrade": "high",
 		"score": 40.75
 	  },
 	  "Florida": {
-		"color": "rgba(178, 34, 34, 0.5)",
+		"colorGrade": "negative",
 		"score": -3.0
 	  },
 	  "Georgia": {
-		"color": "rgba(178, 34, 34, 0.5)",
+		"colorGrade": "negative",
 		"score": -1.0
 	  },
 	  "Guam": {
-		"color": "rgba(255, 127, 80, 0.65)",
+		"colorGrade": "low",
 		"score": 4.75
 	  },
 	  "Hawaii": {
-		"color": "rgba(143, 188, 143, 0.75)",
+		"colorGrade": "medium",
 		"score": 31.25
 	  },
 	  "Idaho": {
-		"color": "rgba(178, 34, 34, 0.5)",
+		"colorGrade": "negative",
 		"score": -9.5
 	  },
 	  "Illinois": {
-		"color": "rgba(0, 100, 0, 0.5)",
+		"colorGrade": "high",
 		"score": 43.0
 	  },
 	  "Indiana": {
-		"color": "rgba(178, 34, 34, 0.5)",
+		"colorGrade": "negative",
 		"score": -2.75
 	  },
 	  "Iowa": {
-		"color": "rgba(255, 127, 80, 0.65)",
+		"colorGrade": "low",
 		"score": 6.5
 	  },
 	  "Kansas": {
-		"color": "rgba(255, 127, 80, 0.65)",
+		"colorGrade": "low",
 		"score": 0.5
 	  },
 	  "Kentucky": {
-		"color": "rgba(255, 127, 80, 0.65)",
+		"colorGrade": "low",
 		"score": 5.0
 	  },
 	  "Louisiana": {
-		"color": "rgba(178, 34, 34, 0.5)",
+		"colorGrade": "negative",
 		"score": -6.75
 	  },
 	  "Maine": {
-		"color": "rgba(0, 100, 0, 0.5)",
+		"colorGrade": "high",
 		"score": 44.5
 	  },
 	  "Maryland": {
-		"color": "rgba(0, 100, 0, 0.5)",
+		"colorGrade": "high",
 		"score": 42.0
 	  },
 	  "Massachusetts": {
-		"color": "rgba(0, 100, 0, 0.5)",
+		"colorGrade": "high",
 		"score": 39
 	  },
 	  "Michigan": {
-		"color": "rgba(143, 188, 143, 0.75)",
+		"colorGrade": "medium",
 		"score": 30
 	  },
 	  "Minnesota": {
-		"color": "rgba(0, 100, 0, 0.5)",
+		"colorGrade": "high",
 		"score": 36.75
 	  },
 	  "Mississippi": {
-		"color": "rgba(178, 34, 34, 0.5)",
+		"colorGrade": "negative",
 		"score": -7.5
 	  },
 	  "Missouri": {
-		"color": "rgba(178, 34, 34, 0.5)",
+		"colorGrade": "negative",
 		"score": -1.5
 	  },
 	  "Montana": {
-		"color": "rgba(178, 34, 34, 0.5)",
+		"colorGrade": "negative",
 		"score": -2.75
 	  },
 	  "Nebraska": {
-		"color": "rgba(255, 127, 80, 0.65)",
+		"colorGrade": "low",
 		"score": 2.25
 	  },
 	  "Nevada": {
-		"color": "rgba(0, 100, 0, 0.5)",
+		"colorGrade": "high",
 		"score": 41.25
 	  },
 	  "New Hampshire": {
-		"color": "rgba(143, 188, 143, 0.75)",
+		"colorGrade": "medium",
 		"score": 32.5
 	  },
 	  "New Jersey": {
-		"color": "rgba(0, 100, 0, 0.5)",
+		"colorGrade": "high",
 		"score": 41.75
 	  },
 	  "New Mexico": {
-		"color": "rgba(143, 188, 143, 0.75)",
+		"colorGrade": "medium",
 		"score": 36.0
 	  },
 	  "New York": {
-		"color": "rgba(0, 100, 0, 0.5)",
+		"colorGrade": "high",
 		"score": 44.5
 	  },
 	  "North Carolina": {
-		"color": "rgba(255, 127, 80, 0.65)",
+		"colorGrade": "low",
 		"score": 7.25
 	  },
 	  "North Dakota": {
-		"color": "rgba(255, 127, 80, 0.65)",
+		"colorGrade": "low",
 		"score": 9.5
 	  },
 	  "Northern Mariana Islands": {
-		"color": "rgba(255, 127, 80, 0.65)",
+		"colorGrade": "low",
 		"score": 2.75
 	  },
 	  "Ohio": {
-		"color": "rgba(255, 127, 80, 0.65)",
+		"colorGrade": "low",
 		"score": 2.25
 	  },
 	  "Oklahoma": {
-		"color": "rgba(178, 34, 34, 0.5)",
+		"colorGrade": "negative",
 		"score": -5.0
 	  },
 	  "Oregon": {
-		"color": "rgba(0, 100, 0, 0.5)",
+		"colorGrade": "high",
 		"score": 37.5
 	  },
 	  "Pennsylvania": {
-		"color": "rgba(189, 183, 107, 0.75)",
+		"colorGrade": "fair",
 		"score": 16.75
 	  },
 	  "Puerto Rico": {
-		"color": "rgba(189, 183, 107, 0.75)",
+		"colorGrade": "fair",
 		"score": 19.75
 	  },
 	  "Rhode Island": {
-		"color": "rgba(0, 100, 0, 0.5)",
+		"colorGrade": "high",
 		"score": 38.0
 	  },
 	  "South Carolina": {
-		"color": "rgba(178, 34, 34, 0.5)",
+		"colorGrade": "negative",
 		"score": -7.75
 	  },
 	  "South Dakota": {
-		"color": "rgba(178, 34, 34, 0.5)",
+		"colorGrade": "negative",
 		"score": -7.5
 	  },
 	  "Tennessee": {
-		"color": "rgba(178, 34, 34, 0.5)",
+		"colorGrade": "negative",
 		"score": -14.0
 	  },
 	  "Texas": {
-		"color": "rgba(178, 34, 34, 0.5)",
+		"colorGrade": "negative",
 		"score": -1.75
 	  },
 	  "U.S. Virgin Islands": {
-		"color": "rgba(189, 183, 107, 0.75)",
+		"colorGrade": "fair",
 		"score": 13.5
 	  },
 	  "Utah": {
-		"color": "rgba(255, 127, 80, 0.65)",
+		"colorGrade": "low",
 		"score": 10.0
 	  },
 	  "Vermont": {
-		"color": "rgba(0, 100, 0, 0.5)",
+		"colorGrade": "high",
 		"score": 38.5
 	  },
 	  "Virginia": {
-		"color": "rgba(143, 188, 143, 0.75)",
+		"colorGrade": "medium",
 		"score": 24.5
 	  },
 	  "Washington": {
-		"color": "rgba(0, 100, 0, 0.5)",
+		"colorGrade": "high",
 		"score": 40.25
 	  },
 	  "West Virginia": {
-		"color": "rgba(178, 34, 34, 0.5)",
+		"colorGrade": "negative",
 		"score": -0.75
 	  },
 	  "Wisconsin": {
-		"color": "rgba(189, 183, 107, 0.75)",
+		"colorGrade": "fair",
 		"score": 17.75
 	  },
 	  "Wyoming": {
-		"color": "rgba(178, 34, 34, 0.5)",
+		"colorGrade": "negative",
 		"score": -6.0
 	  },
 	  "AL": {
-		"color": "rgba(178, 34, 34, 0.5)",
+		"colorGrade": "negative",
 		"score": -10.5
 	  },
 	  "AK": {
-		"color": "rgba(255, 127, 80, 0.65)",
+		"colorGrade": "low",
 		"score": 8.25
 	  },
 	  "AS": {
-		"color": "rgba(255, 127, 80, 0.65)",
+		"colorGrade": "low",
 		"score": 0.0
 	  },
 	  "AZ": {
-		"color": "rgba(255, 127, 80, 0.65)",
+		"colorGrade": "low",
 		"score": 7.5
 	  },
 	  "AR": {
-		"color": "rgba(178, 34, 34, 0.5)",
+		"colorGrade": "negative",
 		"score": -12.25
 	  },
 	  "CA": {
-		"color": "rgba(0, 100, 0, 0.5)",
+		"colorGrade": "high",
 		"score": 45.0
 	  },
 	  "CO": {
-		"color": "rgba(0, 100, 0, 0.5)",
+		"colorGrade": "high",
 		"score": 45.25
 	  },
 	  "CT": {
-		"color": "rgba(0, 100, 0, 0.5)",
+		"colorGrade": "high",
 		"score": 40.75
 	  },
 	  "DE": {
-		"color": "rgba(143, 188, 143, 0.75)",
+		"colorGrade": "medium",
 		"score": 30.25
 	  },
 	  "DC": {
-		"color": "rgba(0, 100, 0, 0.5)",
+		"colorGrade": "high",
 		"score": 40.75
 	  },
 	  "FL": {
-		"color": "rgba(178, 34, 34, 0.5)",
+		"colorGrade": "negative",
 		"score": -3.0
 	  },
 	  "GA": {
-		"color": "rgba(178, 34, 34, 0.5)",
+		"colorGrade": "negative",
 		"score": -1.0
 	  },
 	  "GU": {
-		"color": "rgba(255, 127, 80, 0.65)",
+		"colorGrade": "low",
 		"score": 4.75
 	  },
 	  "HI": {
-		"color": "rgba(143, 188, 143, 0.75)",
+		"colorGrade": "medium",
 		"score": 31.25
 	  },
 	  "ID": {
-		"color": "rgba(178, 34, 34, 0.5)",
+		"colorGrade": "negative",
 		"score": -9.5
 	  },
 	  "IL": {
-		"color": "rgba(0, 100, 0, 0.5)",
+		"colorGrade": "high",
 		"score": 43.0
 	  },
 	  "IN": {
-		"color": "rgba(178, 34, 34, 0.5)",
+		"colorGrade": "negative",
 		"score": -2.75
 	  },
 	  "IA": {
-		"color": "rgba(255, 127, 80, 0.65)",
+		"colorGrade": "low",
 		"score": 6.5
 	  },
 	  "KS": {
-		"color": "rgba(255, 127, 80, 0.65)",
+		"colorGrade": "low",
 		"score": 0.5
 	  },
 	  "KY": {
-		"color": "rgba(255, 127, 80, 0.65)",
+		"colorGrade": "low",
 		"score": 5.0
 	  },
 	  "LA": {
-		"color": "rgba(178, 34, 34, 0.5)",
+		"colorGrade": "negative",
 		"score": -6.75
 	  },
 	  "ME": {
-		"color": "rgba(0, 100, 0, 0.5)",
+		"colorGrade": "high",
 		"score": 44.5
 	  },
 	  "MD": {
-		"color": "rgba(0, 100, 0, 0.5)",
+		"colorGrade": "high",
 		"score": 42.0
 	  },
 	  "MA": {
-		"color": "rgba(0, 100, 0, 0.5)",
+		"colorGrade": "high",
 		"score": 39
 	  },
 	  "MI": {
-		"color": "rgba(143, 188, 143, 0.75)",
+		"colorGrade": "medium",
 		"score": 30
 	  },
 	  "MN": {
-		"color": "rgba(0, 100, 0, 0.5)",
+		"colorGrade": "high",
 		"score": 36.75
 	  },
 	  "MS": {
-		"color": "rgba(178, 34, 34, 0.5)",
+		"colorGrade": "negative",
 		"score": -7.5
 	  },
 	  "MO": {
-		"color": "rgba(178, 34, 34, 0.5)",
+		"colorGrade": "negative",
 		"score": -1.5
 	  },
 	  "MT": {
-		"color": "rgba(178, 34, 34, 0.5)",
+		"colorGrade": "negative",
 		"score": -2.75
 	  },
 	  "NE": {
-		"color": "rgba(255, 127, 80, 0.65)",
+		"colorGrade": "low",
 		"score": 2.25
 	  },
 	  "NV": {
-		"color": "rgba(0, 100, 0, 0.5)",
+		"colorGrade": "high",
 		"score": 41.25
 	  },
 	  "NH": {
-		"color": "rgba(143, 188, 143, 0.75)",
+		"colorGrade": "medium",
 		"score": 32.5
 	  },
 	  "NJ": {
-		"color": "rgba(0, 100, 0, 0.5)",
+		"colorGrade": "high",
 		"score": 41.75
 	  },
 	  "NM": {
-		"color": "rgba(143, 188, 143, 0.75)",
+		"colorGrade": "medium",
 		"score": 36.0
 	  },
 	  "NY": {
-		"color": "rgba(0, 100, 0, 0.5)",
+		"colorGrade": "high",
 		"score": 44.5
 	  },
 	  "NC": {
-		"color": "rgba(255, 127, 80, 0.65)",
+		"colorGrade": "low",
 		"score": 7.25
 	  },
 	  "ND": {
-		"color": "rgba(255, 127, 80, 0.65)",
+		"colorGrade": "low",
 		"score": 9.5
 	  },
 	  "MP": {
-		"color": "rgba(255, 127, 80, 0.65)",
+		"colorGrade": "low",
 		"score": 2.75
 	  },
 	  "OH": {
-		"color": "rgba(255, 127, 80, 0.65)",
+		"colorGrade": "low",
 		"score": 2.25
 	  },
 	  "OK": {
-		"color": "rgba(178, 34, 34, 0.5)",
+		"colorGrade": "negative",
 		"score": -5.0
 	  },
 	  "OR": {
-		"color": "rgba(0, 100, 0, 0.5)",
+		"colorGrade": "high",
 		"score": 37.5
 	  },
 	  "PA": {
-		"color": "rgba(189, 183, 107, 0.75)",
+		"colorGrade": "fair",
 		"score": 16.75
 	  },
 	  "PR": {
-		"color": "rgba(189, 183, 107, 0.75)",
+		"colorGrade": "fair",
 		"score": 19.75
 	  },
 	  "RI": {
-		"color": "rgba(0, 100, 0, 0.5)",
+		"colorGrade": "high",
 		"score": 38.0
 	  },
 	  "SC": {
-		"color": "rgba(178, 34, 34, 0.5)",
+		"colorGrade": "negative",
 		"score": -7.75
 	  },
 	  "SD": {
-		"color": "rgba(178, 34, 34, 0.5)",
+		"colorGrade": "negative",
 		"score": -7.5
 	  },
 	  "TN": {
-		"color": "rgba(178, 34, 34, 0.5)",
+		"colorGrade": "negative",
 		"score": -14.0
 	  },
 	  "TX": {
-		"color": "rgba(178, 34, 34, 0.5)",
+		"colorGrade": "negative",
 		"score": -1.75
 	  },
 	  "VI": {
-		"color": "rgba(189, 183, 107, 0.75)",
+		"colorGrade": "fair",
 		"score": 13.5
 	  },
 	  "UT": {
-		"color": "rgba(255, 127, 80, 0.65)",
+		"colorGrade": "low",
 		"score": 10.0
 	  },
 	  "VT": {
-		"color": "rgba(0, 100, 0, 0.5)",
+		"colorGrade": "high",
 		"score": 38.5
 	  },
 	  "VA": {
-		"color": "rgba(143, 188, 143, 0.75)",
+		"colorGrade": "medium",
 		"score": 24.5
 	  },
 	  "WA": {
-		"color": "rgba(0, 100, 0, 0.5)",
+		"colorGrade": "high",
 		"score": 40.25
 	  },
 	  "WV": {
-		"color": "rgba(178, 34, 34, 0.5)",
+		"colorGrade": "negative",
 		"score": -0.75
 	  },
 	  "WI": {
-		"color": "rgba(189, 183, 107, 0.75)",
+		"colorGrade": "fair",
 		"score": 17.75
 	  },
 	  "WY": {
-		"color": "rgba(178, 34, 34, 0.5)",
+		"colorGrade": "negative",
 		"score": -6.0
 	  }
 	},
@@ -460,451 +468,451 @@ const stateScores = {
 
 	Secondary = {
 	  "Alabama": {
-		"color": "rgba(178, 34, 34, 0.5)",
+		"colorGrade": "negative",
 		"score": -7.75
 	  },
 	  "Alaska": {
-		"color": "rgba(255, 127, 80, 0.65)",
+		"colorGrade": "low",
 		"score": 4.25
 	  },
 	  "American Samoa": {
-		"color": "rgba(255, 127, 80, 0.65)",
+		"colorGrade": "low",
 		"score": 0.0
 	  },
 	  "Arizona": {
-		"color": "rgba(178, 34, 34, 0.5)",
+		"colorGrade": "negative",
 		"score": -0.25
 	  },
 	  "Arkansas": {
-		"color": "rgba(178, 34, 34, 0.5)",
+		"colorGrade": "negative",
 		"score": -8.25
 	  },
 	  "California": {
-		"color": "rgba(0, 100, 0, 0.5)",
+		"colorGrade": "high",
 		"score": 23.25
 	  },
 	  "Colorado": {
-		"color": "rgba(0, 100, 0, 0.5)",
+		"colorGrade": "high",
 		"score": 23.25
 	  },
 	  "Connecticut": {
-		"color": "rgba(0, 100, 0, 0.5)",
+		"colorGrade": "high",
 		"score": 22.25
 	  },
 	  "Delaware": {
-		"color": "rgba(143, 188, 143, 0.75)",
+		"colorGrade": "medium",
 		"score": 16.5
 	  },
 	  "District of Columbia": {
-		"color": "rgba(0, 100, 0, 0.5)",
+		"colorGrade": "high",
 		"score": 22.5
 	  },
 	  "Florida": {
-		"color": "rgba(178, 34, 34, 0.5)",
+		"colorGrade": "negative",
 		"score": -6.25
 	  },
 	  "Georgia": {
-		"color": "rgba(178, 34, 34, 0.5)",
+		"colorGrade": "negative",
 		"score": -1.0
 	  },
 	  "Guam": {
-		"color": "rgba(178, 34, 34, 0.5)",
+		"colorGrade": "negative",
 		"score": -0.75
 	  },
 	  "Hawaii": {
-		"color": "rgba(143, 188, 143, 0.75)",
+		"colorGrade": "medium",
 		"score": 17.75
 	  },
 	  "Idaho": {
-		"color": "rgba(178, 34, 34, 0.5)",
+		"colorGrade": "negative",
 		"score": -7.5
 	  },
 	  "Illinois": {
-		"color": "rgba(0, 100, 0, 0.5)",
+		"colorGrade": "high",
 		"score": 22.5
 	  },
 	  "Indiana": {
-		"color": "rgba(178, 34, 34, 0.5)",
+		"colorGrade": "negative",
 		"score": -3.75
 	  },
 	  "Iowa": {
-		"color": "rgba(255, 127, 80, 0.65)",
+		"colorGrade": "low",
 		"score": 3.0
 	  },
 	  "Kansas": {
-		"color": "rgba(178, 34, 34, 0.5)",
+		"colorGrade": "negative",
 		"score": -1.75
 	  },
 	  "Kentucky": {
-		"color": "rgba(255, 127, 80, 0.65)",
+		"colorGrade": "low",
 		"score": 0.0
 	  },
 	  "Louisiana": {
-		"color": "rgba(178, 34, 34, 0.5)",
+		"colorGrade": "negative",
 		"score": -7.25
 	  },
 	  "Maine": {
-		"color": "rgba(0, 100, 0, 0.5)",
+		"colorGrade": "high",
 		"score": 23.5
 	  },
 	  "Maryland": {
-		"color": "rgba(0, 100, 0, 0.5)",
+		"colorGrade": "high",
 		"score": 22.75
 	  },
 	  "Massachusetts": {
-		"color": "rgba(0, 100, 0, 0.5)",
+		"colorGrade": "high",
 		"score": 20.25
 	  },
 	  "Michigan": {
-		"color": "rgba(143, 188, 143, 0.75)",
+		"colorGrade": "medium",
 		"score": 14.0
 	  },
 	  "Minnesota": {
-		"color": "rgba(0, 100, 0, 0.5)",
+		"colorGrade": "high",
 		"score": 21.0
 	  },
 	  "Mississippi": {
-		"color": "rgba(178, 34, 34, 0.5)",
+		"colorGrade": "negative",
 		"score": -6.0
 	  },
 	  "Missouri": {
-		"color": "rgba(178, 34, 34, 0.5)",
+		"colorGrade": "negative",
 		"score": -5.5
 	  },
 	  "Montana": {
-		"color": "rgba(178, 34, 34, 0.5)",
+		"colorGrade": "negative",
 		"score": -4.0
 	  },
 	  "Nebraska": {
-		"color": "rgba(178, 34, 34, 0.5)",
+		"colorGrade": "negative",
 		"score": -2.25
 	  },
 	  "Nevada": {
-		"color": "rgba(0, 100, 0, 0.5)",
+		"colorGrade": "high",
 		"score": 21.0
 	  },
 	  "New Hampshire": {
-		"color": "rgba(143, 188, 143, 0.75)",
+		"colorGrade": "medium",
 		"score": 15.0
 	  },
 	  "New Jersey": {
-		"color": "rgba(0, 100, 0, 0.5)",
+		"colorGrade": "high",
 		"score": 23.25
 	  },
 	  "New Mexico": {
-		"color": "rgba(143, 188, 143, 0.75)",
+		"colorGrade": "medium",
 		"score": 19.0
 	  },
 	  "New York": {
-		"color": "rgba(0, 100, 0, 0.5)",
+		"colorGrade": "high",
 		"score": 24.0
 	  },
 	  "North Carolina": {
-		"color": "rgba(255, 127, 80, 0.65)",
+		"colorGrade": "low",
 		"score": 2.0
 	  },
 	  "North Dakota": {
-		"color": "rgba(255, 127, 80, 0.65)",
+		"colorGrade": "low",
 		"score": 0.75
 	  },
 	  "Northern Mariana Islands": {
-		"color": "rgba(178, 34, 34, 0.5)",
+		"colorGrade": "negative",
 		"score": -0.75
 	  },
 	  "Ohio": {
-		"color": "rgba(255, 127, 80, 0.65)",
+		"colorGrade": "low",
 		"score": 2.25
 	  },
 	  "Oklahoma": {
-		"color": "rgba(178, 34, 34, 0.5)",
+		"colorGrade": "negative",
 		"score": -6.5
 	  },
 	  "Oregon": {
-		"color": "rgba(0, 100, 0, 0.5)",
+		"colorGrade": "high",
 		"score": 21.0
 	  },
 	  "Pennsylvania": {
-		"color": "rgba(189, 183, 107, 0.75)",
+		"colorGrade": "fair",
 		"score": 10.5
 	  },
 	  "Puerto Rico": {
-		"color": "rgba(189, 183, 107, 0.75)",
+		"colorGrade": "fair",
 		"score": 10.5
 	  },
 	  "Rhode Island": {
-		"color": "rgba(0, 100, 0, 0.5)",
+		"colorGrade": "high",
 		"score": 20.25
 	  },
 	  "South Carolina": {
-		"color": "rgba(178, 34, 34, 0.5)",
+		"colorGrade": "negative",
 		"score": -8.25
 	  },
 	  "South Dakota": {
-		"color": "rgba(178, 34, 34, 0.5)",
+		"colorGrade": "negative",
 		"score": -5.0
 	  },
 	  "Tennessee": {
-		"color": "rgba(178, 34, 34, 0.5)",
+		"colorGrade": "negative",
 		"score": -11.25
 	  },
 	  "Texas": {
-		"color": "rgba(178, 34, 34, 0.5)",
+		"colorGrade": "negative",
 		"score": -3.75
 	  },
 	  "U.S. Virgin Islands": {
-		"color": "rgba(255, 127, 80, 0.65)",
+		"colorGrade": "low",
 		"score": 4.75
 	  },
 	  "Utah": {
-		"color": "rgba(255, 127, 80, 0.65)",
+		"colorGrade": "low",
 		"score": 1.75
 	  },
 	  "Vermont": {
-		"color": "rgba(0, 100, 0, 0.5)",
+		"colorGrade": "high",
 		"score": 20.5
 	  },
 	  "Virginia": {
-		"color": "rgba(143, 188, 143, 0.75)",
+		"colorGrade": "medium",
 		"score": 14.5
 	  },
 	  "Washington": {
-		"color": "rgba(0, 100, 0, 0.5)",
+		"colorGrade": "high",
 		"score": 22.0
 	  },
 	  "West Virginia": {
-		"color": "rgba(255, 127, 80, 0.65)",
+		"colorGrade": "low",
 		"score": 1.0
 	  },
 	  "Wisconsin": {
-		"color": "rgba(255, 127, 80, 0.65)",
+		"colorGrade": "low",
 		"score": 5.5
 	  },
 	  "Wyoming": {
-		"color": "rgba(178, 34, 34, 0.5)",
+		"colorGrade": "negative",
 		"score": -2.75
 	  },
 	  "AL": {
-		"color": "rgba(178, 34, 34, 0.5)",
+		"colorGrade": "negative",
 		"score": -7.75
 	  },
 	  "AK": {
-		"color": "rgba(255, 127, 80, 0.65)",
+		"colorGrade": "low",
 		"score": 4.25
 	  },
 	  "AS": {
-		"color": "rgba(255, 127, 80, 0.65)",
+		"colorGrade": "low",
 		"score": 0.0
 	  },
 	  "AZ": {
-		"color": "rgba(178, 34, 34, 0.5)",
+		"colorGrade": "negative",
 		"score": -0.25
 	  },
 	  "AR": {
-		"color": "rgba(178, 34, 34, 0.5)",
+		"colorGrade": "negative",
 		"score": -8.25
 	  },
 	  "CA": {
-		"color": "rgba(0, 100, 0, 0.5)",
+		"colorGrade": "high",
 		"score": 23.25
 	  },
 	  "CO": {
-		"color": "rgba(0, 100, 0, 0.5)",
+		"colorGrade": "high",
 		"score": 23.25
 	  },
 	  "CT": {
-		"color": "rgba(0, 100, 0, 0.5)",
+		"colorGrade": "high",
 		"score": 22.25
 	  },
 	  "DE": {
-		"color": "rgba(143, 188, 143, 0.75)",
+		"colorGrade": "medium",
 		"score": 16.5
 	  },
 	  "DC": {
-		"color": "rgba(0, 100, 0, 0.5)",
+		"colorGrade": "high",
 		"score": 22.5
 	  },
 	  "FL": {
-		"color": "rgba(178, 34, 34, 0.5)",
+		"colorGrade": "negative",
 		"score": -6.25
 	  },
 	  "GA": {
-		"color": "rgba(178, 34, 34, 0.5)",
+		"colorGrade": "negative",
 		"score": -1.0
 	  },
 	  "GU": {
-		"color": "rgba(178, 34, 34, 0.5)",
+		"colorGrade": "negative",
 		"score": -0.75
 	  },
 	  "HI": {
-		"color": "rgba(143, 188, 143, 0.75)",
+		"colorGrade": "medium",
 		"score": 17.75
 	  },
 	  "ID": {
-		"color": "rgba(178, 34, 34, 0.5)",
+		"colorGrade": "negative",
 		"score": -7.5
 	  },
 	  "IL": {
-		"color": "rgba(0, 100, 0, 0.5)",
+		"colorGrade": "high",
 		"score": 22.5
 	  },
 	  "IN": {
-		"color": "rgba(178, 34, 34, 0.5)",
+		"colorGrade": "negative",
 		"score": -3.75
 	  },
 	  "IA": {
-		"color": "rgba(255, 127, 80, 0.65)",
+		"colorGrade": "low",
 		"score": 3.0
 	  },
 	  "KS": {
-		"color": "rgba(178, 34, 34, 0.5)",
+		"colorGrade": "negative",
 		"score": -1.75
 	  },
 	  "KY": {
-		"color": "rgba(255, 127, 80, 0.65)",
+		"colorGrade": "low",
 		"score": 0.0
 	  },
 	  "LA": {
-		"color": "rgba(178, 34, 34, 0.5)",
+		"colorGrade": "negative",
 		"score": -7.25
 	  },
 	  "ME": {
-		"color": "rgba(0, 100, 0, 0.5)",
+		"colorGrade": "high",
 		"score": 23.5
 	  },
 	  "MD": {
-		"color": "rgba(0, 100, 0, 0.5)",
+		"colorGrade": "high",
 		"score": 22.75
 	  },
 	  "MA": {
-		"color": "rgba(0, 100, 0, 0.5)",
+		"colorGrade": "high",
 		"score": 20.25
 	  },
 	  "MI": {
-		"color": "rgba(143, 188, 143, 0.75)",
+		"colorGrade": "medium",
 		"score": 14.0
 	  },
 	  "MN": {
-		"color": "rgba(0, 100, 0, 0.5)",
+		"colorGrade": "high",
 		"score": 21.0
 	  },
 	  "MS": {
-		"color": "rgba(178, 34, 34, 0.5)",
+		"colorGrade": "negative",
 		"score": -6.0
 	  },
 	  "MO": {
-		"color": "rgba(178, 34, 34, 0.5)",
+		"colorGrade": "negative",
 		"score": -5.5
 	  },
 	  "MT": {
-		"color": "rgba(178, 34, 34, 0.5)",
+		"colorGrade": "negative",
 		"score": -4.0
 	  },
 	  "NE": {
-		"color": "rgba(178, 34, 34, 0.5)",
+		"colorGrade": "negative",
 		"score": -2.25
 	  },
 	  "NV": {
-		"color": "rgba(0, 100, 0, 0.5)",
+		"colorGrade": "high",
 		"score": 21.0
 	  },
 	  "NH": {
-		"color": "rgba(143, 188, 143, 0.75)",
+		"colorGrade": "medium",
 		"score": 15.0
 	  },
 	  "NJ": {
-		"color": "rgba(0, 100, 0, 0.5)",
+		"colorGrade": "high",
 		"score": 23.25
 	  },
 	  "NM": {
-		"color": "rgba(143, 188, 143, 0.75)",
+		"colorGrade": "medium",
 		"score": 19.0
 	  },
 	  "NY": {
-		"color": "rgba(0, 100, 0, 0.5)",
+		"colorGrade": "high",
 		"score": 24.0
 	  },
 	  "NC": {
-		"color": "rgba(255, 127, 80, 0.65)",
+		"colorGrade": "low",
 		"score": 2.0
 	  },
 	  "ND": {
-		"color": "rgba(255, 127, 80, 0.65)",
+		"colorGrade": "low",
 		"score": 0.75
 	  },
 	  "MP": {
-		"color": "rgba(178, 34, 34, 0.5)",
+		"colorGrade": "negative",
 		"score": -0.75
 	  },
 	  "OH": {
-		"color": "rgba(255, 127, 80, 0.65)",
+		"colorGrade": "low",
 		"score": 2.25
 	  },
 	  "OK": {
-		"color": "rgba(178, 34, 34, 0.5)",
+		"colorGrade": "negative",
 		"score": -6.5
 	  },
 	  "OR": {
-		"color": "rgba(0, 100, 0, 0.5)",
+		"colorGrade": "high",
 		"score": 21.0
 	  },
 	  "PA": {
-		"color": "rgba(189, 183, 107, 0.75)",
+		"colorGrade": "fair",
 		"score": 10.5
 	  },
 	  "PR": {
-		"color": "rgba(189, 183, 107, 0.75)",
+		"colorGrade": "fair",
 		"score": 10.5
 	  },
 	  "RI": {
-		"color": "rgba(0, 100, 0, 0.5)",
+		"colorGrade": "high",
 		"score": 20.25
 	  },
 	  "SC": {
-		"color": "rgba(178, 34, 34, 0.5)",
+		"colorGrade": "negative",
 		"score": -8.25
 	  },
 	  "SD": {
-		"color": "rgba(178, 34, 34, 0.5)",
+		"colorGrade": "negative",
 		"score": -5.0
 	  },
 	  "TN": {
-		"color": "rgba(178, 34, 34, 0.5)",
+		"colorGrade": "negative",
 		"score": -11.25
 	  },
 	  "TX": {
-		"color": "rgba(178, 34, 34, 0.5)",
+		"colorGrade": "negative",
 		"score": -3.75
 	  },
 	  "VI": {
-		"color": "rgba(255, 127, 80, 0.65)",
+		"colorGrade": "low",
 		"score": 4.75
 	  },
 	  "UT": {
-		"color": "rgba(255, 127, 80, 0.65)",
+		"colorGrade": "low",
 		"score": 1.75
 	  },
 	  "VT": {
-		"color": "rgba(0, 100, 0, 0.5)",
+		"colorGrade": "high",
 		"score": 20.5
 	  },
 	  "VA": {
-		"color": "rgba(143, 188, 143, 0.75)",
+		"colorGrade": "medium",
 		"score": 14.5
 	  },
 	  "WA": {
-		"color": "rgba(0, 100, 0, 0.5)",
+		"colorGrade": "high",
 		"score": 22.0
 	  },
 	  "WV": {
-		"color": "rgba(255, 127, 80, 0.65)",
+		"colorGrade": "low",
 		"score": 1.0
 	  },
 	  "WI": {
-		"color": "rgba(255, 127, 80, 0.65)",
+		"colorGrade": "low",
 		"score": 5.5
 	  },
 	  "WY": {
-		"color": "rgba(178, 34, 34, 0.5)",
+		"colorGrade": "negative",
 		"score": -2.75
 	  }
 	}
