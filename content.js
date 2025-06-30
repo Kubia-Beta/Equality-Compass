@@ -142,13 +142,16 @@ async function applyLinkedinColoring() {
 /**
  * Processes the text of a location into relevant city and state parts.
  * @param originalText, the text object we are trying to process
- * @return { city , state }, an object containing the city and state parts.
+ * @return { city , state , trailing }, an object containing the processed location parts.
  */
 function processLocation(originalText){
 	// Separate trailing info like (Remote), (On-site), etc.
 	const parenIndex = originalText.indexOf(" (");
-	const trailing = parenIndex !== -1 ? originalText.slice(parenIndex) : "";
+	// Ternary / if/else 
+	const trailing = parenIndex !== -1 ? originalText.slice(parenIndex) : ""; // Check if trailing text exists and assign it
+	// Check where the parenthesis are and assign it
 	const locationPart = parenIndex !== -1 ? originalText.slice(0, parenIndex) : originalText;
+	
 
 	const parts = locationPart.split(",").map(p => p.trim()); // Split by comma
 
@@ -220,6 +223,7 @@ async function processSpan(span) {
 		colors[stateCandidate] || colors[stateCandidate.toUpperCase()];
 	if (!entry) return; // Not a match for any known state/territory
 	
+	// Grab the score and colorGrade from the entry, process the grade into a score
 	const { colorGrade, score } = entry;
 	const stateColor = policyColors[colorGrade];
 
@@ -230,7 +234,7 @@ async function processSpan(span) {
 		span.appendChild(document.createTextNode(city + ", "));
 	}
 
-	// Add colored and formatted state span
+	// Add colored and formatted state span element
 	const stateSpan = document.createElement("span");
 	stateSpan.textContent = stateCandidate;
 	stateSpan.style.backgroundColor = stateColor;
@@ -245,7 +249,7 @@ async function processSpan(span) {
 		stateSpan.title = tooltipText;
 		stateSpan.dataset.tooltipContent = tooltipText;
 		stateSpan.dataset.tooltipApplied = "true";
-		console.log("[Equality Compass] Processing tooltip " + tooltipText);
+		//console.log("[Equality Compass] Processing tooltip " + tooltipText);
 	}
 
 	// Add any remaining trailing info if it exists
