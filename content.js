@@ -36,8 +36,10 @@ else if (window.location.hostname.includes("ziprecruiter.com")) {
 	applyZiprecruiterColoring();
 }
 
+
 /**
  * Color helper function. Call to color any of the supported areas in the United States.
+ * Currently supports: LinkedIn, Indeed, ZipRecruiter.
  */
 function colorHelper(){
 	if (window.location.href.includes("linkedin.com")){
