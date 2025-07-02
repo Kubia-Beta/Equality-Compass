@@ -40,13 +40,13 @@ else if (window.location.hostname.includes("ziprecruiter.com")) {
  * Color helper function. Call to color any of the supported areas in the United States.
  */
 function colorHelper(){
-	if (window.location.href.includes("linkedin")){
+	if (window.location.href.includes("linkedin.com")){
 		applyLinkedinColoring(); 
 	}
-	else if (window.location.href.includes("indeed")){
+	else if (window.location.href.includes("indeed.com")){
 		applyIndeedColoring();
 	}
-	else if (window.location.href.includes("ziprecruiter")){
+	else if (window.location.href.includes("ziprecruiter.com")){
 		applyIndeedColoring();
 	}
 }
@@ -140,6 +140,7 @@ async function applyLinkedinColoring() {
 	}
 }
 
+
 /**
  * Recolors all visible job listing location spans on the page on Ziprecruiter.
  */
@@ -148,10 +149,12 @@ async function applyZiprecruiterColoring() {
 	for (const span of locationSpans) {
 		if (!span.dataset.processed) {
 		span.dataset.processed = "true";
+		console.log("[Equality Compass] Processing span " + span);
 		await processSpan(span);
 		}
 	}
 }
+
 
 /**
  * Processes the text of a location into relevant city and state parts.
