@@ -17,6 +17,7 @@
 
 // Startup
 console.log("[Equality Compass] Content script loaded");
+
 /**
  * Initial application in case listings already exist on page load.
  * Checks against which website is currently in use.
@@ -36,22 +37,6 @@ else if (window.location.hostname.includes("ziprecruiter.com")) {
 	applyZiprecruiterColoring();
 }
 
-
-/**
- * Color helper function. Call to color any of the supported areas in the United States.
- * Currently supports: LinkedIn, Indeed, ZipRecruiter.
- */
-function colorHelper(){
-	if (window.location.href.includes("linkedin.com")){
-		applyLinkedinColoring(); 
-	}
-	else if (window.location.href.includes("indeed.com")){
-		applyIndeedColoring();
-	}
-	else if (window.location.href.includes("ziprecruiter.com")){
-		applyIndeedColoring();
-	}
-}
 
 /**
  * Listen for messages from the popup to reprocess listings when the user changes addon settings.
@@ -107,11 +92,29 @@ const observer = new MutationObserver((mutations) => {
 	}
 });
 
+
 // Begin observing the entire body for dynamically injected listings
 observer.observe(document.body, {
 	childList: true,
 	subtree: true // Important: LinkedIn deeply injects content
 });
+
+
+/**
+ * Color helper function. Call to color any of the supported areas in the United States.
+ * Currently supports: LinkedIn, Indeed, ZipRecruiter.
+ */
+function colorHelper(){
+	if (window.location.href.includes("linkedin.com")){
+		applyLinkedinColoring(); 
+	}
+	else if (window.location.href.includes("indeed.com")){
+		applyIndeedColoring();
+	}
+	else if (window.location.href.includes("ziprecruiter.com")){
+		applyZiprecruiterColoring();
+	}
+}
 
 
 /**
@@ -151,7 +154,7 @@ async function applyZiprecruiterColoring() {
 	for (const span of locationSpans) {
 		if (!span.dataset.processed) {
 		span.dataset.processed = "true";
-		console.log("[Equality Compass] Processing span " + span);
+		//console.log("[Equality Compass] Processing span " + span);
 		await processSpan(span);
 		}
 	}
