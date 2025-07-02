@@ -17,7 +17,39 @@
 
 // Startup
 console.log("[Equality Compass] Content script loaded");
+/**
+ * Initial application in case listings already exist on page load.
+ * Checks against which website is currently in use.
+ * For Indeed, runs the coloring function multiple times due to strange async loading.
+ */
+if (window.location.href.includes("linkedin.com")){
+	applyLinkedinColoring(); 
+}
+else if (window.location.hostname.includes("indeed.com")) {
+	for (var i = 1; i < 5; i++) { // Run this 4 times
+		setTimeout(function(){
+			applyIndeedColoring();
+		}, 2000 * i); // Fires at 2s, 4s, 6s, 8s.
+	}
+}
+else if (window.location.hostname.includes("ziprecruiter.com")) {
+	applyZiprecruiterColoring();
+}
 
+/**
+ * Color helper function. Call to color any of the supported areas in the United States.
+ */
+function colorHelper(){
+	if (window.location.href.includes("linkedin")){
+		applyLinkedinColoring(); 
+	}
+	else if (window.location.href.includes("indeed")){
+		applyIndeedColoring();
+	}
+	else if (window.location.href.includes("ziprecruiter")){
+		applyIndeedColoring();
+	}
+}
 
 /**
  * Listen for messages from the popup to reprocess listings when the user changes addon settings.
@@ -30,45 +62,16 @@ browser.runtime.onMessage.addListener((msg) => {
 		document.querySelectorAll('[data-processed="true"]').forEach(el => {
 			el.removeAttribute("data-processed");
 		});
-		// Recolor all current listings with new mode
-		if (window.location.href.includes("linkedin")){
-			applyLinkedinColoring(); 
-		}
-		else if (window.location.href.includes("indeed")){
-			applyIndeedColoring();
-		}
-	} else if (msg.type === "tooltipChanged"){
+		colorHelper(); // Recolor all current listings with new mode
+	}
+	else if (msg.type === "tooltipChanged"){
 		console.log("[Equality Compass] Tooltips changed — reprocessing all visible spans");
 		document.querySelectorAll('[data-processed="true"]').forEach(el => {
 			el.removeAttribute("data-processed");
 		});
-		// Recolor all current listings with new mode
-		if (window.location.href.includes("linkedin")){
-			applyLinkedinColoring(); 
-		}
-		else if (window.location.href.includes("indeed")){
-			applyIndeedColoring();
-		}
+		colorHelper(); // Reprocess all current listings
 	}
 });
-
-
-/**
- * Initial application in case listings already exist on page load.
- * Checks against which website is currently in use.
- * For Indeed, runs the coloring function multiple times due to strange async loading.
- */
-if (window.location.href.includes("linkedin")){
-	applyLinkedinColoring(); 
-}
-else if (window.location.hostname.includes("indeed.com")) {
-	// Two second
-	for (var i = 1; i < 5; i++) { // Run this 5 times
-		setTimeout(function(){
-			applyIndeedColoring();
-		}, 2000 * i); // Fires at 2s, 4s, 6s, 8s, 10s.
-	}
-}
 
 
 /**
@@ -114,7 +117,7 @@ observer.observe(document.body, {
  * Uses a querySelectorAll to find matching spans that haven't been processed.
  */
 function applyIndeedColoring() {
-  const locationSpans = document.querySelectorAll('div[data-testid="text-location"]');
+  const locationSpans = document.querySelectorAll('div[data-testid="text-location"]'); // Identifier div
   locationSpans.forEach(span => {
     if (!span.dataset.processed) {
       span.dataset.processed = "true";
@@ -126,11 +129,10 @@ function applyIndeedColoring() {
 
 /**
  * Recolors all visible job listing location spans on the page on LinkedIn.
- * Uses a querySelectorAll to find matching spans that haven't been processed.
  */
 async function applyLinkedinColoring() {
-	const spans = document.querySelectorAll('.artdeco-entity-lockup__caption span[dir="ltr"]');
-	for (const span of spans) {
+	const locationSpans = document.querySelectorAll('.artdeco-entity-lockup__caption span[dir="ltr"]'); // Identifier class
+	for (const span of locationSpans) {
 		if (!span.dataset.processed) {
 		span.dataset.processed = "true";
 		await processSpan(span);
@@ -138,6 +140,18 @@ async function applyLinkedinColoring() {
 	}
 }
 
+/**
+ * Recolors all visible job listing location spans on the page on Ziprecruiter.
+ */
+async function applyZiprecruiterColoring() {
+	const locationSpans = document.querySelectorAll("[data-testid='job-card-location']"); // Identifier data
+	for (const span of locationSpans) {
+		if (!span.dataset.processed) {
+		span.dataset.processed = "true";
+		await processSpan(span);
+		}
+	}
+}
 
 /**
  * Processes the text of a location into relevant city and state parts.
