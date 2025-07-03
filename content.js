@@ -124,7 +124,7 @@ function colorHelper(){
 function applyIndeedColoring() {
   const locationSpans = document.querySelectorAll('div[data-testid="text-location"]'); // Identifier div
   locationSpans.forEach(span => {
-    if (!span.dataset.processed) { //FIXME: Review this versus For loop
+    if (!span.dataset.processed) { // A for loop fails here
       span.dataset.processed = "true";
       processSpan(span);
     }
