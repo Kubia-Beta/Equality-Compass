@@ -62,15 +62,16 @@ browser.runtime.onMessage.addListener((msg) => {
 
 
 /**
- * Persistent MutationObserver that handles all dynamic LinkedIn changes.
+ * Persistent MutationObserver that handles all dynamic changes. Terminates when there is no watchable page.
  * Watches the entire document for new nodes that match the job span selector.
- * This is reliable on LinkedIn's SPA behavior.
+ * For ZipRecruiter, this observer has a delay in action to prevent flickering.
+ * This is reliable on both LinkedIn's and ZipRecruiter's Single Page Application (SPA) behavior.
  */
 const observer = new MutationObserver((mutations) => {
 	// NOT LinkedIn and NOT ZipRecruiter
 	if (!window.location.href.includes("linkedin") && !window.location.href.includes("ziprecruiter")) {
 		observer.disconnect(); // Turn the observer off
-		console.log("[Equality Compass] Disconnecting DOM Observer");
+		//console.log("[Equality Compass] Disconnecting DOM Observer");
 	}
 	for (const mutation of mutations) {
 		for (const node of mutation.addedNodes) {
@@ -92,16 +93,15 @@ const observer = new MutationObserver((mutations) => {
 			} else if (window.location.href.includes("ziprecruiter")){
 				// Check if the node itself or its descendants match our target ZipRecruiter span
 				const spans = node.matches?.("[data-testid='job-card-location']")
-					? [node] // Node is directly the target span
+					? [node] 
 					: node.querySelectorAll?.("[data-testid='job-card-location']") || []; // Or search inside it
 					
-				setTimeout(function(){
-					spans.forEach(span => {
-						// Only handle spans within job location components
+				setTimeout(function(){ // Delay to prevent the highlighted span from popping in and out during SPA changes
+					spans.forEach(span => { // ZipRecruiter dynamically changes the page multiple times when you click a job
 						const parent = span.closest("[data-testid='job-card-location']");
 						if (parent && !span.dataset.processed) {
-						span.dataset.processed = "true"; // Mark as processed
-						processSpan(span); // Apply highlighting
+						span.dataset.processed = "true";
+						processSpan(span);
 						}
 					})
 				}, 200);
