@@ -67,27 +67,45 @@ browser.runtime.onMessage.addListener((msg) => {
  * This is reliable on LinkedIn's SPA behavior.
  */
 const observer = new MutationObserver((mutations) => {
-	if (!window.location.href.includes("linkedin")) { // NOT LinkedIn
+	// NOT LinkedIn and NOT ZipRecruiter
+	if (!window.location.href.includes("linkedin") && !window.location.href.includes("ziprecruiter")) {
 		observer.disconnect(); // Turn the observer off
-		console.log("[Equality Compass] Disconnecting LinkedIn Observer");
+		console.log("[Equality Compass] Disconnecting DOM Observer");
 	}
 	for (const mutation of mutations) {
 		for (const node of mutation.addedNodes) {
 			if (!(node instanceof HTMLElement)) continue; // Skip non-element nodes
+			if (window.location.href.includes("linkedin")) {
+				// Check if the node itself or its descendants match our target linkedin span
+				const spans = node.matches?.('span[dir="ltr"]')
+					? [node] // Node is directly the target span
+					: node.querySelectorAll?.('span[dir="ltr"]') || []; // Or search inside it
 
-			// Check if the node itself or its descendants match our target span
-			const spans = node.matches?.('span[dir="ltr"]')
-				? [node] // Node is directly the target span
-				: node.querySelectorAll?.('span[dir="ltr"]') || []; // Or search inside it
-
-			spans.forEach(span => {
-				// Only handle spans within job location components
-				const parent = span.closest('.artdeco-entity-lockup__caption');
-				if (parent && !span.dataset.processed) {
-				span.dataset.processed = "true"; // Mark as processed
-				processSpan(span); // Apply highlighting
-				}
-			});
+				spans.forEach(span => {
+					// Only handle spans within job location components
+					const parent = span.closest('.artdeco-entity-lockup__caption');
+					if (parent && !span.dataset.processed) {
+					span.dataset.processed = "true"; // Mark as processed
+					processSpan(span); // Apply highlighting
+					}
+				});
+			} else if (window.location.href.includes("ziprecruiter")){
+				// Check if the node itself or its descendants match our target ZipRecruiter span
+				const spans = node.matches?.("[data-testid='job-card-location']")
+					? [node] // Node is directly the target span
+					: node.querySelectorAll?.("[data-testid='job-card-location']") || []; // Or search inside it
+					
+				setTimeout(function(){
+					spans.forEach(span => {
+						// Only handle spans within job location components
+						const parent = span.closest("[data-testid='job-card-location']");
+						if (parent && !span.dataset.processed) {
+						span.dataset.processed = "true"; // Mark as processed
+						processSpan(span); // Apply highlighting
+						}
+					})
+				}, 200);
+			}
 		}
 	}
 });
