@@ -15,6 +15,12 @@
  */
  
 
+// store modified tabs in a map. ex. (likely an id not tab name) "(24) cybersecurity Jobs | LinkedIn" : "0",
+// user changes settings, for loop on all tabs to set them to 1,
+// make a call to recolor the active tab with try catch, on success set 0
+
+
+
 // Startup
 console.log("[Equality Compass] Content script loaded");
 
