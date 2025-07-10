@@ -1,24 +1,16 @@
 /**
- * LinkedIn State Colorizer Content Script
- * Colors listings of LinkedIn job postings by their state according to their equalitymaps color.
+ * Job State Coloring Content Script
+ * Colors listings of job postings by their state according to their equalitymaps color.
  * Handles dynamic content loading, SPA navigation, and mode toggling.
- * The scripting is designed to be blisteringly quick and as lightweight as possible for the end-user.
+ * Currently supports Indeed, LinkedIn, and ZipRecruiter.
  *
  * Note that the derived color is the overall policy tally, a mix of Sexual Orientation and Gender Identity.
  * Secondary mode is for trans-identifying folk who need to know the gender identity tally more than overall policy.
  * Please also note that while I am using EqualityMap's language such as "Fair policy tally", this does not
  * mean I agree with the assessment of the word "fairness", nor does it necessarily map to the outlook of
  * the people who live in that area.
- * If you are transgender, especially a transgender woman of color, please consider high and medium policy
- * areas in secondary mode only for your safety if possible.
  *
  */
- 
-
-// store modified tabs in a map. ex. (likely an id not tab name) "(24) cybersecurity Jobs | LinkedIn" : "0",
-// user changes settings, for loop on all tabs to set them to 1,
-// make a call to recolor the active tab with try catch, on success set 0
-
 
 
 // Startup
@@ -211,29 +203,51 @@ function processLocation(originalText){
 		if (parts[0] === "Remote") { 
 			city = null;
 			stateCandidate = parts [2]
-		} else { // Phoenix, AZ, U.S.
+		}
+		else { // Phoenix, AZ, U.S.
 			city = parts[0];
 			stateCandidate = parts[1];
 		}
 		
-	} else if (parts.length === 2) {
+	}
+	else if (parts.length === 2) {
 		if (parts[1] === "United States"
 			|| parts[1] === "US"
 			|| parts[1] === "U.S.") 
 			{ // ex. Nevada, United States
 			city = null;
 			stateCandidate = parts[0];
-		} else if (/\d/.test(parts[1])){ // has numeric, so city, state zip
+		}
+		else if (/\d/.test(parts[1])){ // has numeric, so city, state zip
 			// Find where the zip begins
 			const zipIndex = parts[1].search(/[0-9]/);
 			// Assign the state without the leading whitespace before the zip
 			stateCandidate = parts[1].substring(0, (zipIndex - 1));
 			city = parts[0];
-		} else { // ex. Phoenix, Arizona
+		}
+		else { // ex. Phoenix, Arizona
 			city = parts[0];
 			stateCandidate = parts[1];
-		} 
-	} else {
+		}
+	}
+	else if (parts.length === 1) {
+		// Handle cases for "remote in state", "hybrid work in state"
+		// split into substring by space
+		// access the last substring
+			// Handle 10 state cases with a space, 2 territory cases with a single space
+				// if last-1 === "new" || "north" || "rhode" || "south" || "west" || "american" || "puerto"
+					// string is last-1 + " " + last
+			// special case for mariana and virgin islands
+				// if last-1 === "mariana"
+					// string is last-2 + " " + last-1 + " " + last
+				// else if last-1 === "virgin"
+					// string is last-1 + " " + last, U.S. Virgin Islands is covered by case Virgin Islands
+					// and not all listings will put U.S. Virgin Islands
+		// pass result to singular string
+		// assign this to state
+		// set city to null
+	}
+	else {
 		city = null;
 		stateCandidate = parts[0];
 	}
