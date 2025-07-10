@@ -94,6 +94,10 @@ const stateScores = {
 		"colorGrade": "high",
 		"score": 40.75
 	  },
+	  "D.C.": {
+		"colorGrade": "high",
+		"score": 40.75
+	  },
 	  "Florida": {
 		"colorGrade": "negative",
 		"score": -3.0
@@ -399,6 +403,14 @@ const stateScores = {
 		"score": -1.75
 	  },
 	  "U.S. Virgin Islands": {
+		"colorGrade": "fair",
+		"score": 13.5
+	  },
+	  "US Virgin Islands": {
+		"colorGrade": "fair",
+		"score": 13.5
+	  },
+	  "Virgin Islands": {
 		"colorGrade": "fair",
 		"score": 13.5
 	  },
@@ -547,6 +559,10 @@ const stateScores = {
 		"colorGrade": "high",
 		"score": 22.5
 	  },
+	  "D.C.": {
+		"colorGrade": "high",
+		"score": 22.5
+	  },
 	  "Florida": {
 		"colorGrade": "negative",
 		"score": -6.25
@@ -852,6 +868,14 @@ const stateScores = {
 		"score": -3.75
 	  },
 	  "U.S. Virgin Islands": {
+		"colorGrade": "low",
+		"score": 4.75
+	  },
+	  "US Virgin Islands": {
+		"colorGrade": "low",
+		"score": 4.75
+	  },
+	  "Virgin Islands": {
 		"colorGrade": "low",
 		"score": 4.75
 	  },
