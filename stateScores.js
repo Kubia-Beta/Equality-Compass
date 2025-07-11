@@ -1,7 +1,6 @@
 // Here are the state scores and policy colors in a human readable format used by content.js.
 // Primary is the initial state, and is the overall state score determined by MAP.
 // Secondary is the Gender Identiy score, and is determined by MAP.
-// Minified using https://minify-js.com/
 
 window.policyColors = {
 	"high": "rgba(0, 100, 0, 0.5)",
