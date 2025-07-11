@@ -8,12 +8,12 @@ const toggle = document.getElementById("modeToggle");
 
 // Load saved setting from storage
 browser.storage.local.get("mode").then(({ mode }) => {
-	toggle.checked = mode === "Secondary";
+	toggle.checked = mode === "GenderIdentityTally";
 });
 
 // Listen for changes to the Aggregate/GI toggle
 toggle.addEventListener("change", () => {
-	const newMode = toggle.checked ? "Secondary" : "Primary";
+	const newMode = toggle.checked ? "GenderIdentityTally" : "OverallTally";
 	browser.storage.local.set({ mode: newMode }).then(() => {
 		// Send message to active tab
 		browser.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
