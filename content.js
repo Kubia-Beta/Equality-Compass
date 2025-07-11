@@ -253,7 +253,7 @@ function processLocation(originalText){
 		else { // Remote in 
 			stateCandidate = spaceParts[spaceParts.length - 1];
 		}
-	}
+	} // FIXME: parts.length === 1 seems to wipe out the "remote in". Trailing data is saved, preceeding data is not
 	else {
 		city = null;
 		stateCandidate = parts[0];
