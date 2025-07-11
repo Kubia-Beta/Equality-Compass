@@ -4,8 +4,8 @@
  * Handles dynamic content loading, SPA navigation, and mode toggling.
  * Currently supports Indeed, LinkedIn, and ZipRecruiter.
  *
- * Note that the derived color is the overall policy tally, a mix of Sexual Orientation and Gender Identity.
- * Secondary mode is for trans-identifying folk who need to know the gender identity tally more than overall policy.
+ * Note that the default derived color is the overall policy tally.
+ * GenderIdentityTally mode is for folk who need to know the gender identity tally more than overall policy tally.
  * Please also note that while I am using EqualityMap's language such as "Fair policy tally", this does not
  * mean I agree with the assessment of the word "fairness", nor does it necessarily map to the outlook of
  * the people who live in that area.
@@ -25,7 +25,7 @@ if (window.location.href.includes("linkedin.com")){
 	applyLinkedinColoring(); 
 }
 else if (window.location.hostname.includes("indeed.com")) {
-	for (var i = 1; i < 5; i++) { // Run this 4 times
+	for (let i = 1; i < 5; i++) { // Run this 4 times
 		setTimeout(function(){
 			applyIndeedColoring();
 		}, 2000 * i); // Fires at 2s, 4s, 6s, 8s.
@@ -38,7 +38,7 @@ else if (window.location.hostname.includes("ziprecruiter.com")) {
 
 /**
  * Listen for messages from the popup to reprocess listings when the user changes addon settings.
- * Settings: Primary/Gender Identity mode, Tooltips on/off.
+ * Settings: Overall Tally/Gender Identity Tally mode, Tooltips on/off.
  */
 browser.runtime.onMessage.addListener((msg) => {
 	if (msg.type === "modeChanged") {
@@ -138,75 +138,66 @@ function colorHelper(){
  * Uses a querySelectorAll to find matching spans that haven't been processed.
  */
 function applyIndeedColoring() {
-  const locationSpans = document.querySelectorAll('div[data-testid="text-location"]'); // Identifier div
-  locationSpans.forEach(span => {
-    if (!span.dataset.processed) { // A for loop fails here
-      span.dataset.processed = "true";
-      processSpan(span);
-    }
-  });
+	const locationSpans = document.querySelectorAll('div[data-testid="text-location"]');
+	locationSpans.forEach(span => {
+		if (!span.dataset.processed) {
+			span.dataset.processed = "true";
+			processSpan(span);
+		}
+	});
 }
 
 
 /**
  * Recolors all visible job listing location spans on the page on LinkedIn.
  */
-async function applyLinkedinColoring() {
+function applyLinkedinColoring() {
 	const locationSpans = document.querySelectorAll('.artdeco-entity-lockup__caption span[dir="ltr"]'); // Identifier class
-	for (const span of locationSpans) {
+	locationSpans.forEach(span => {
 		if (!span.dataset.processed) {
-		span.dataset.processed = "true";
-		await processSpan(span);
+			span.dataset.processed = "true";
+			processSpan(span);
 		}
-	}
+	});
 }
 
 
 /**
  * Recolors all visible job listing location spans on the page on Ziprecruiter.
  */
-async function applyZiprecruiterColoring() {
+function applyZiprecruiterColoring() {
 	const locationSpans = document.querySelectorAll("[data-testid='job-card-location']"); // Identifier data
-	for (const span of locationSpans) {
+	locationSpans.forEach(span => {
 		if (!span.dataset.processed) {
-		span.dataset.processed = "true";
-		//console.log("[Equality Compass] Processing span " + span);
-		await processSpan(span);
+			span.dataset.processed = "true";
+			processSpan(span);
 		}
-	}
+	});
 }
 
 
 /**
  * Processes the text of a location into relevant city and state parts.
  * @param originalText, the text object we are trying to process
- * @return { city , state , trailing }, an object containing the processed location parts.
+ * @return { precedingText , stateCandidate, trailingText }, an object containing the processed location parts.
  */
 function processLocation(originalText){
 	// Separate trailing info like (Remote), (On-site), etc.
 	const parenIndex = originalText.indexOf(" (");
-	// Ternary / if/else 
-	// const trailing = parenIndex !== -1 ? originalText.slice(parenIndex) : ""; // Check if trailing text exists and assign it
-	// Check where the parenthesis are and assign it
+	// Check where the parenthesis are and assign it in a ternary if/else: if parenIndex check, true : false
 	const locationPart = parenIndex !== -1 ? originalText.slice(0, parenIndex) : originalText;
-	
+	const parts = locationPart.split(",").map(p => p.trim()); // Split by comma and trim whitespace
 
-	const parts = locationPart.split(",").map(p => p.trim()); // Split by comma
-
-
-	let city = null;
 	let stateCandidate = null;
 
 	// Handle formats: City, State or State, United States or City, State, United States
 	if (parts.length === 3) {
 		// ex. Remote in, Remote from, etc.
 		if (parts[0] === "Remote") { 
-			city = null;
 			stateCandidate = parts [2]
 		}
 		else if (parts[2] === "USA" || parts[2] === "United States") { // city, state, USA
 			stateCandidate = parts[1];
-			city = parts[1];
 		}
 		else { // Phoenix, AZ, U.S.
 			city = parts[0];
@@ -219,7 +210,6 @@ function processLocation(originalText){
 			|| parts[1] === "US"
 			|| parts[1] === "U.S.") 
 			{ // ex. Nevada, United States
-			city = null;
 			stateCandidate = parts[0];
 		}
 		else if (/\d/.test(parts[1])){ // has numeric, so city, state zip
@@ -227,10 +217,8 @@ function processLocation(originalText){
 			const zipIndex = parts[1].search(/[0-9]/);
 			// Assign the state without the leading whitespace before the zip
 			stateCandidate = parts[1].substring(0, (zipIndex - 1));
-			city = parts[0];
 		}
 		else { // ex. Phoenix, Arizona
-			city = parts[0];
 			stateCandidate = parts[1];
 		}
 	}
@@ -253,22 +241,20 @@ function processLocation(originalText){
 		else { // Remote in 
 			stateCandidate = spaceParts[spaceParts.length - 1];
 		}
-	} // FIXME: parts.length === 1 seems to wipe out the "remote in". Trailing data is saved, preceeding data is not
-	// Seems to be a problem in general. Might need to change trailing to "other data" and define it as the subtraction
-	// of the original text and the text we want to parse
+	}
 	else {
-		city = null;
 		stateCandidate = parts[0];
 	}
 	
 	// construct the surrounding text
 	let reconstructor = originalText;
 	const stateLocation = reconstructor.indexOf(stateCandidate);
-	const preceedingText = reconstructor.slice(0, stateLocation);
+	const precedingText = reconstructor.slice(0, stateLocation);
 	const trailingText = reconstructor.slice(stateLocation + stateCandidate.length);
 	
-	return { preceedingText , stateCandidate, trailingText }
+	return { precedingText , stateCandidate, trailingText }
 }
+
 
 /**
  * Highlights a single span element with state coloring based on mode.
@@ -277,11 +263,8 @@ function processLocation(originalText){
  */
 async function processSpan(span) {
 	// { defaults } = unless { storage is different }
-	const { mode = "Primary", tooltipsEnabled = true } = await browser.storage.local.get(["mode", "tooltipsEnabled"]);
+	const { mode = "OverallTally", tooltipsEnabled = true } = await browser.storage.local.get(["mode", "tooltipsEnabled"]);
 
-	// Minified versions. Human readable format located in stateScores.js. Minified using https://minify-js.com/
-	const policyColors={high:"rgba(0, 100, 0, 0.5)",medium:"rgba(143, 188, 143, 0.75)",fair:"rgba(189, 183, 107, 0.75)",low:"rgba(255, 127, 80, 0.65)",negative:"rgba(178, 34, 34, 0.5)"};
-	const stateScores={Primary:Primary={Alabama:{colorGrade:"negative",score:-10.5},Alaska:{colorGrade:"low",score:8.25},"American Samoa":{colorGrade:"low",score:0},Arizona:{colorGrade:"low",score:7.5},Arkansas:{colorGrade:"negative",score:-12.25},California:{colorGrade:"high",score:45},Colorado:{colorGrade:"high",score:45.25},Connecticut:{colorGrade:"high",score:40.75},Delaware:{colorGrade:"medium",score:30.25},"District of Columbia":{colorGrade:"high",score:40.75},Florida:{colorGrade:"negative",score:-3},Georgia:{colorGrade:"negative",score:-1},Guam:{colorGrade:"low",score:4.75},Hawaii:{colorGrade:"medium",score:31.25},Idaho:{colorGrade:"negative",score:-9.5},Illinois:{colorGrade:"high",score:43},Indiana:{colorGrade:"negative",score:-2.75},Iowa:{colorGrade:"low",score:6.5},Kansas:{colorGrade:"low",score:.5},Kentucky:{colorGrade:"low",score:5},Louisiana:{colorGrade:"negative",score:-6.75},Maine:{colorGrade:"high",score:44.5},Maryland:{colorGrade:"high",score:42},Massachusetts:{colorGrade:"high",score:39},Michigan:{colorGrade:"medium",score:30},Minnesota:{colorGrade:"high",score:36.75},Mississippi:{colorGrade:"negative",score:-7.5},Missouri:{colorGrade:"negative",score:-1.5},Montana:{colorGrade:"negative",score:-2.75},Nebraska:{colorGrade:"low",score:2.25},Nevada:{colorGrade:"high",score:41.25},"New Hampshire":{colorGrade:"medium",score:32.5},"New Jersey":{colorGrade:"high",score:41.75},"New Mexico":{colorGrade:"medium",score:36},"New York":{colorGrade:"high",score:44.5},"North Carolina":{colorGrade:"low",score:7.25},"North Dakota":{colorGrade:"low",score:9.5},"Northern Mariana Islands":{colorGrade:"low",score:2.75},Ohio:{colorGrade:"low",score:2.25},Oklahoma:{colorGrade:"negative",score:-5},Oregon:{colorGrade:"high",score:37.5},Pennsylvania:{colorGrade:"fair",score:16.75},"Puerto Rico":{colorGrade:"fair",score:19.75},"Rhode Island":{colorGrade:"high",score:38},"South Carolina":{colorGrade:"negative",score:-7.75},"South Dakota":{colorGrade:"negative",score:-7.5},Tennessee:{colorGrade:"negative",score:-14},Texas:{colorGrade:"negative",score:-1.75},"U.S. Virgin Islands":{colorGrade:"fair",score:13.5},Utah:{colorGrade:"low",score:10},Vermont:{colorGrade:"high",score:38.5},Virginia:{colorGrade:"medium",score:24.5},Washington:{colorGrade:"high",score:40.25},"West Virginia":{colorGrade:"negative",score:-.75},Wisconsin:{colorGrade:"fair",score:17.75},Wyoming:{colorGrade:"negative",score:-6},AL:{colorGrade:"negative",score:-10.5},AK:{colorGrade:"low",score:8.25},AS:{colorGrade:"low",score:0},AZ:{colorGrade:"low",score:7.5},AR:{colorGrade:"negative",score:-12.25},CA:{colorGrade:"high",score:45},CO:{colorGrade:"high",score:45.25},CT:{colorGrade:"high",score:40.75},DE:{colorGrade:"medium",score:30.25},DC:{colorGrade:"high",score:40.75},FL:{colorGrade:"negative",score:-3},GA:{colorGrade:"negative",score:-1},GU:{colorGrade:"low",score:4.75},HI:{colorGrade:"medium",score:31.25},ID:{colorGrade:"negative",score:-9.5},IL:{colorGrade:"high",score:43},IN:{colorGrade:"negative",score:-2.75},IA:{colorGrade:"low",score:6.5},KS:{colorGrade:"low",score:.5},KY:{colorGrade:"low",score:5},LA:{colorGrade:"negative",score:-6.75},ME:{colorGrade:"high",score:44.5},MD:{colorGrade:"high",score:42},MA:{colorGrade:"high",score:39},MI:{colorGrade:"medium",score:30},MN:{colorGrade:"high",score:36.75},MS:{colorGrade:"negative",score:-7.5},MO:{colorGrade:"negative",score:-1.5},MT:{colorGrade:"negative",score:-2.75},NE:{colorGrade:"low",score:2.25},NV:{colorGrade:"high",score:41.25},NH:{colorGrade:"medium",score:32.5},NJ:{colorGrade:"high",score:41.75},NM:{colorGrade:"medium",score:36},NY:{colorGrade:"high",score:44.5},NC:{colorGrade:"low",score:7.25},ND:{colorGrade:"low",score:9.5},MP:{colorGrade:"low",score:2.75},OH:{colorGrade:"low",score:2.25},OK:{colorGrade:"negative",score:-5},OR:{colorGrade:"high",score:37.5},PA:{colorGrade:"fair",score:16.75},PR:{colorGrade:"fair",score:19.75},RI:{colorGrade:"high",score:38},SC:{colorGrade:"negative",score:-7.75},SD:{colorGrade:"negative",score:-7.5},TN:{colorGrade:"negative",score:-14},TX:{colorGrade:"negative",score:-1.75},VI:{colorGrade:"fair",score:13.5},UT:{colorGrade:"low",score:10},VT:{colorGrade:"high",score:38.5},VA:{colorGrade:"medium",score:24.5},WA:{colorGrade:"high",score:40.25},WV:{colorGrade:"negative",score:-.75},WI:{colorGrade:"fair",score:17.75},WY:{colorGrade:"negative",score:-6}},Secondary:Secondary={Alabama:{colorGrade:"negative",score:-7.75},Alaska:{colorGrade:"low",score:4.25},"American Samoa":{colorGrade:"low",score:0},Arizona:{colorGrade:"negative",score:-.25},Arkansas:{colorGrade:"negative",score:-8.25},California:{colorGrade:"high",score:23.25},Colorado:{colorGrade:"high",score:23.25},Connecticut:{colorGrade:"high",score:22.25},Delaware:{colorGrade:"medium",score:16.5},"District of Columbia":{colorGrade:"high",score:22.5},Florida:{colorGrade:"negative",score:-6.25},Georgia:{colorGrade:"negative",score:-1},Guam:{colorGrade:"negative",score:-.75},Hawaii:{colorGrade:"medium",score:17.75},Idaho:{colorGrade:"negative",score:-7.5},Illinois:{colorGrade:"high",score:22.5},Indiana:{colorGrade:"negative",score:-3.75},Iowa:{colorGrade:"low",score:3},Kansas:{colorGrade:"negative",score:-1.75},Kentucky:{colorGrade:"low",score:0},Louisiana:{colorGrade:"negative",score:-7.25},Maine:{colorGrade:"high",score:23.5},Maryland:{colorGrade:"high",score:22.75},Massachusetts:{colorGrade:"high",score:20.25},Michigan:{colorGrade:"medium",score:14},Minnesota:{colorGrade:"high",score:21},Mississippi:{colorGrade:"negative",score:-6},Missouri:{colorGrade:"negative",score:-5.5},Montana:{colorGrade:"negative",score:-4},Nebraska:{colorGrade:"negative",score:-2.25},Nevada:{colorGrade:"high",score:21},"New Hampshire":{colorGrade:"medium",score:15},"New Jersey":{colorGrade:"high",score:23.25},"New Mexico":{colorGrade:"medium",score:19},"New York":{colorGrade:"high",score:24},"North Carolina":{colorGrade:"low",score:2},"North Dakota":{colorGrade:"low",score:.75},"Northern Mariana Islands":{colorGrade:"negative",score:-.75},Ohio:{colorGrade:"low",score:2.25},Oklahoma:{colorGrade:"negative",score:-6.5},Oregon:{colorGrade:"high",score:21},Pennsylvania:{colorGrade:"fair",score:10.5},"Puerto Rico":{colorGrade:"fair",score:10.5},"Rhode Island":{colorGrade:"high",score:20.25},"South Carolina":{colorGrade:"negative",score:-8.25},"South Dakota":{colorGrade:"negative",score:-5},Tennessee:{colorGrade:"negative",score:-11.25},Texas:{colorGrade:"negative",score:-3.75},"U.S. Virgin Islands":{colorGrade:"low",score:4.75},Utah:{colorGrade:"low",score:1.75},Vermont:{colorGrade:"high",score:20.5},Virginia:{colorGrade:"medium",score:14.5},Washington:{colorGrade:"high",score:22},"West Virginia":{colorGrade:"low",score:1},Wisconsin:{colorGrade:"low",score:5.5},Wyoming:{colorGrade:"negative",score:-2.75},AL:{colorGrade:"negative",score:-7.75},AK:{colorGrade:"low",score:4.25},AS:{colorGrade:"low",score:0},AZ:{colorGrade:"negative",score:-.25},AR:{colorGrade:"negative",score:-8.25},CA:{colorGrade:"high",score:23.25},CO:{colorGrade:"high",score:23.25},CT:{colorGrade:"high",score:22.25},DE:{colorGrade:"medium",score:16.5},DC:{colorGrade:"high",score:22.5},FL:{colorGrade:"negative",score:-6.25},GA:{colorGrade:"negative",score:-1},GU:{colorGrade:"negative",score:-.75},HI:{colorGrade:"medium",score:17.75},ID:{colorGrade:"negative",score:-7.5},IL:{colorGrade:"high",score:22.5},IN:{colorGrade:"negative",score:-3.75},IA:{colorGrade:"low",score:3},KS:{colorGrade:"negative",score:-1.75},KY:{colorGrade:"low",score:0},LA:{colorGrade:"negative",score:-7.25},ME:{colorGrade:"high",score:23.5},MD:{colorGrade:"high",score:22.75},MA:{colorGrade:"high",score:20.25},MI:{colorGrade:"medium",score:14},MN:{colorGrade:"high",score:21},MS:{colorGrade:"negative",score:-6},MO:{colorGrade:"negative",score:-5.5},MT:{colorGrade:"negative",score:-4},NE:{colorGrade:"negative",score:-2.25},NV:{colorGrade:"high",score:21},NH:{colorGrade:"medium",score:15},NJ:{colorGrade:"high",score:23.25},NM:{colorGrade:"medium",score:19},NY:{colorGrade:"high",score:24},NC:{colorGrade:"low",score:2},ND:{colorGrade:"low",score:.75},MP:{colorGrade:"negative",score:-.75},OH:{colorGrade:"low",score:2.25},OK:{colorGrade:"negative",score:-6.5},OR:{colorGrade:"high",score:21},PA:{colorGrade:"fair",score:10.5},PR:{colorGrade:"fair",score:10.5},RI:{colorGrade:"high",score:20.25},SC:{colorGrade:"negative",score:-8.25},SD:{colorGrade:"negative",score:-5},TN:{colorGrade:"negative",score:-11.25},TX:{colorGrade:"negative",score:-3.75},VI:{colorGrade:"low",score:4.75},UT:{colorGrade:"low",score:1.75},VT:{colorGrade:"high",score:20.5},VA:{colorGrade:"medium",score:14.5},WA:{colorGrade:"high",score:22},WV:{colorGrade:"low",score:1},WI:{colorGrade:"low",score:5.5},WY:{colorGrade:"negative",score:-2.75}}};
 	// Change object table based on current mode
 	const colors = stateScores[mode];
 
@@ -290,22 +273,23 @@ async function processSpan(span) {
 	span.dataset.originalText = originalText;
 	
 	// Separate our city and state and any trailing information along with it
-	const { preceedingText , stateCandidate, trailingText } = processLocation(originalText);
+	const { precedingText , stateCandidate, trailingText } = processLocation(originalText);
 	
 	// Check if our state is in the score listing
 	const entry =
 		colors[stateCandidate] || colors[stateCandidate.toUpperCase()];
 	if (!entry) return; // Not a match for any known state/territory
 	
-	// Grab the score and colorGrade from the entry, process the grade into a score
+	// Grab the score and colorGrade from the entry
 	const { colorGrade, score } = entry;
 	const stateColor = policyColors[colorGrade];
 
 	// Clear and reconstruct the span content
 	span.textContent = "";
-	// Add city and comma if city exists
-	if (preceedingText) {
-		span.appendChild(document.createTextNode(preceedingText));
+	
+	// Add the leading content
+	if (precedingText) {
+		span.appendChild(document.createTextNode(precedingText));
 	}
 
 	// Add colored and formatted state span element
@@ -324,11 +308,10 @@ async function processSpan(span) {
 	}
 	
 	// Tooltips section
-	if (tooltipsEnabled) { // Add a tooltip if enabled (default = true)
+	if (tooltipsEnabled) { // Add a tooltip if enabled (enabled by default)
 		const tooltipText = `${stateCandidate} — MAP score: ${score.toFixed(2)}`;
 		stateSpan.title = tooltipText;
 		stateSpan.dataset.tooltipContent = tooltipText;
 		stateSpan.dataset.tooltipApplied = "true";
-		//console.log("[Equality Compass] Processing tooltip " + tooltipText);
 	}
 }

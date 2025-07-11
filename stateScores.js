@@ -3,7 +3,7 @@
 // Secondary is the Gender Identiy score, and is determined by MAP.
 // Minified using https://minify-js.com/
 
-const policyColors = {
+window.policyColors = {
 	"high": "rgba(0, 100, 0, 0.5)",
 	"medium": "rgba(143, 188, 143, 0.75)",
 	"fair": "rgba(189, 183, 107, 0.75)",
@@ -12,8 +12,8 @@ const policyColors = {
 }
 
 
-const stateScores = {
-	Primary = {
+window.stateScores = {
+	OverallTally: {
 	  "Alabama": {
 		"colorGrade": "negative",
 		"score": -10.5
@@ -478,7 +478,7 @@ const stateScores = {
 
 
 
-	Secondary = {
+	GenderIdentityTally: {
 	  "Alabama": {
 		"colorGrade": "negative",
 		"score": -7.75
