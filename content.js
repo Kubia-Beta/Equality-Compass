@@ -1,19 +1,17 @@
 /**
- * LinkedIn State Colorizer Content Script
- * Colors listings of LinkedIn job postings by their state according to their equalitymaps color.
+ * Job State Coloring Content Script
+ * Colors listings of job postings by their state according to their equalitymaps color.
  * Handles dynamic content loading, SPA navigation, and mode toggling.
- * The scripting is designed to be blisteringly quick and as lightweight as possible for the end-user.
+ * Currently supports Indeed, LinkedIn, and ZipRecruiter.
  *
  * Note that the derived color is the overall policy tally, a mix of Sexual Orientation and Gender Identity.
  * Secondary mode is for trans-identifying folk who need to know the gender identity tally more than overall policy.
  * Please also note that while I am using EqualityMap's language such as "Fair policy tally", this does not
  * mean I agree with the assessment of the word "fairness", nor does it necessarily map to the outlook of
  * the people who live in that area.
- * If you are transgender, especially a transgender woman of color, please consider high and medium policy
- * areas in secondary mode only for your safety if possible.
  *
  */
- 
+
 
 // Startup
 console.log("[Equality Compass] Content script loaded");
@@ -188,7 +186,7 @@ function processLocation(originalText){
 	// Separate trailing info like (Remote), (On-site), etc.
 	const parenIndex = originalText.indexOf(" (");
 	// Ternary / if/else 
-	const trailing = parenIndex !== -1 ? originalText.slice(parenIndex) : ""; // Check if trailing text exists and assign it
+	// const trailing = parenIndex !== -1 ? originalText.slice(parenIndex) : ""; // Check if trailing text exists and assign it
 	// Check where the parenthesis are and assign it
 	const locationPart = parenIndex !== -1 ? originalText.slice(0, parenIndex) : originalText;
 	
@@ -205,36 +203,72 @@ function processLocation(originalText){
 		if (parts[0] === "Remote") { 
 			city = null;
 			stateCandidate = parts [2]
-		} else { // Phoenix, AZ, U.S.
+		}
+		else if (parts[2] === "USA" || parts[2] === "United States") { // city, state, USA
+			stateCandidate = parts[1];
+			city = parts[1];
+		}
+		else { // Phoenix, AZ, U.S.
 			city = parts[0];
 			stateCandidate = parts[1];
 		}
 		
-	} else if (parts.length === 2) {
+	}
+	else if (parts.length === 2) {
 		if (parts[1] === "United States"
 			|| parts[1] === "US"
 			|| parts[1] === "U.S.") 
 			{ // ex. Nevada, United States
 			city = null;
 			stateCandidate = parts[0];
-		} else if (/\d/.test(parts[1])){ // has numeric, so city, state zip
+		}
+		else if (/\d/.test(parts[1])){ // has numeric, so city, state zip
 			// Find where the zip begins
 			const zipIndex = parts[1].search(/[0-9]/);
 			// Assign the state without the leading whitespace before the zip
 			stateCandidate = parts[1].substring(0, (zipIndex - 1));
 			city = parts[0];
-		} else { // ex. Phoenix, Arizona
+		}
+		else { // ex. Phoenix, Arizona
 			city = parts[0];
 			stateCandidate = parts[1];
-		} 
-	} else {
+		}
+	}
+	else if (parts.length === 1) { // Handle cases for "remote in X", "hybrid work in X"
+		// split into substring by space
+		const spaceParts = locationPart.split(" ").map(p => p.trim()); // Split by space
+		const testSubstring = spaceParts[spaceParts.length - 2]; // Access the second to last substring
+		const validSingleSpaceLocations = ["new", "north", "rhode", "south", "west", "american", "puerto"];
+		const validDoubleSpaceLocations = ["mariana", "virgin"];
+		
+		if (validSingleSpaceLocations.includes(testSubstring)) {
+			// ex. puerto + " " rico, stateCandidate = "Puerto Rico"
+			stateCandidate = spaceParts[spaceParts.length - 2] + " " + spaceParts[spaceParts.length - 1];
+		}
+		else if (validDoubleSpaceLocations.includes(testSubstring)) {
+			// ex. "U.S. Virgin Islands"
+			stateCandidate = spaceParts[spaceParts.length - 3] + " " + 
+			spaceParts[spaceParts.length - 2] + " " + spaceParts[spaceParts.length - 1];
+		}
+		else { // Remote in 
+			stateCandidate = spaceParts[spaceParts.length - 1];
+		}
+	} // FIXME: parts.length === 1 seems to wipe out the "remote in". Trailing data is saved, preceeding data is not
+	// Seems to be a problem in general. Might need to change trailing to "other data" and define it as the subtraction
+	// of the original text and the text we want to parse
+	else {
 		city = null;
 		stateCandidate = parts[0];
 	}
 	
-	return { city , stateCandidate, trailing }
+	// construct the surrounding text
+	let reconstructor = originalText;
+	const stateLocation = reconstructor.indexOf(stateCandidate);
+	const preceedingText = reconstructor.slice(0, stateLocation);
+	const trailingText = reconstructor.slice(stateLocation + stateCandidate.length);
+	
+	return { preceedingText , stateCandidate, trailingText }
 }
-
 
 /**
  * Highlights a single span element with state coloring based on mode.
@@ -256,7 +290,7 @@ async function processSpan(span) {
 	span.dataset.originalText = originalText;
 	
 	// Separate our city and state and any trailing information along with it
-	const { city , stateCandidate, trailing } = processLocation(originalText);
+	const { preceedingText , stateCandidate, trailingText } = processLocation(originalText);
 	
 	// Check if our state is in the score listing
 	const entry =
@@ -270,8 +304,8 @@ async function processSpan(span) {
 	// Clear and reconstruct the span content
 	span.textContent = "";
 	// Add city and comma if city exists
-	if (city) {
-		span.appendChild(document.createTextNode(city + ", "));
+	if (preceedingText) {
+		span.appendChild(document.createTextNode(preceedingText));
 	}
 
 	// Add colored and formatted state span element
@@ -283,6 +317,12 @@ async function processSpan(span) {
 	stateSpan.style.color = "white";
 	stateSpan.style.outline = "1px solid black"
 	span.appendChild(stateSpan);
+	
+	// Add any remaining trailing info if it exists
+	if (trailingText) {
+		span.appendChild(document.createTextNode(trailingText))
+	}
+	
 	// Tooltips section
 	if (tooltipsEnabled) { // Add a tooltip if enabled (default = true)
 		const tooltipText = `${stateCandidate} — MAP score: ${score.toFixed(2)}`;
@@ -290,10 +330,5 @@ async function processSpan(span) {
 		stateSpan.dataset.tooltipContent = tooltipText;
 		stateSpan.dataset.tooltipApplied = "true";
 		//console.log("[Equality Compass] Processing tooltip " + tooltipText);
-	}
-
-	// Add any remaining trailing info if it exists
-	if (trailing) {
-		span.appendChild(document.createTextNode(trailing));
 	}
 }
