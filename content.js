@@ -204,6 +204,10 @@ function processLocation(originalText){
 			city = null;
 			stateCandidate = parts [2]
 		}
+		else if (parts[2] === "USA" || parts[2] === "United States") { // city, state, USA
+			stateCandidate = parts[1];
+			city = parts[1];
+		}
 		else { // Phoenix, AZ, U.S.
 			city = parts[0];
 			stateCandidate = parts[1];
@@ -230,22 +234,25 @@ function processLocation(originalText){
 			stateCandidate = parts[1];
 		}
 	}
-	else if (parts.length === 1) {
-		// Handle cases for "remote in state", "hybrid work in state"
+	else if (parts.length === 1) { // Handle cases for "remote in X", "hybrid work in X"
 		// split into substring by space
-		// access the last substring
-			// Handle 10 state cases with a space, 2 territory cases with a single space
-				// if last-1 === "new" || "north" || "rhode" || "south" || "west" || "american" || "puerto"
-					// string is last-1 + " " + last
-			// special case for mariana and virgin islands
-				// if last-1 === "mariana"
-					// string is last-2 + " " + last-1 + " " + last
-				// else if last-1 === "virgin"
-					// string is last-1 + " " + last, U.S. Virgin Islands is covered by case Virgin Islands
-					// and not all listings will put U.S. Virgin Islands
-		// pass result to singular string
-		// assign this to state
-		// set city to null
+		const spaceParts = locationPart.split(" ").map(p => p.trim()); // Split by space
+		const testSubstring = spaceParts[spaceParts.length - 2]; // Access the second to last substring
+		const validSingleSpaceLocations = ["new", "north", "rhode", "south", "west", "american", "puerto"];
+		const validDoubleSpaceLocations = ["mariana", "virgin"];
+		
+		if (validSingleSpaceLocations.includes(testSubstring)) {
+			// ex. puerto + " " rico, stateCandidate = "Puerto Rico"
+			stateCandidate = spaceParts[spaceParts.length - 2] + " " + spaceParts[spaceParts.length - 1];
+		}
+		else if (validDoubleSpaceLocations.includes(testSubstring)) {
+			// ex. "U.S. Virgin Islands"
+			stateCandidate = spaceParts[spaceParts.length - 3] + " " + 
+			spaceParts[spaceParts.length - 2] + " " + spaceParts[spaceParts.length - 1];
+		}
+		else { // Remote in 
+			stateCandidate = spaceParts[spaceParts.length - 1];
+		}
 	}
 	else {
 		city = null;
