@@ -186,7 +186,6 @@ function processLocation(originalText){
 	// Separate trailing info like (Remote), (On-site), etc.
 	const parenIndex = originalText.indexOf(" (");
 	// Ternary / if/else 
-	// const trailing = parenIndex !== -1 ? originalText.slice(parenIndex) : ""; // Check if trailing text exists and assign it
 	// Check where the parenthesis are and assign it
 	const locationPart = parenIndex !== -1 ? originalText.slice(0, parenIndex) : originalText;
 	
