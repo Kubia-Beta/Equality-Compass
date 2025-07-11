@@ -186,7 +186,7 @@ function processLocation(originalText){
 	// Separate trailing info like (Remote), (On-site), etc.
 	const parenIndex = originalText.indexOf(" (");
 	// Ternary / if/else 
-	const trailing = parenIndex !== -1 ? originalText.slice(parenIndex) : ""; // Check if trailing text exists and assign it
+	// const trailing = parenIndex !== -1 ? originalText.slice(parenIndex) : ""; // Check if trailing text exists and assign it
 	// Check where the parenthesis are and assign it
 	const locationPart = parenIndex !== -1 ? originalText.slice(0, parenIndex) : originalText;
 	
@@ -254,14 +254,21 @@ function processLocation(originalText){
 			stateCandidate = spaceParts[spaceParts.length - 1];
 		}
 	} // FIXME: parts.length === 1 seems to wipe out the "remote in". Trailing data is saved, preceeding data is not
+	// Seems to be a problem in general. Might need to change trailing to "other data" and define it as the subtraction
+	// of the original text and the text we want to parse
 	else {
 		city = null;
 		stateCandidate = parts[0];
 	}
 	
-	return { city , stateCandidate, trailing }
+	// construct the surrounding text
+	let reconstructor = originalText;
+	const stateLocation = reconstructor.indexOf(stateCandidate);
+	const preceedingText = reconstructor.slice(0, stateLocation);
+	const trailingText = reconstructor.slice(stateLocation + stateCandidate.length);
+	
+	return { preceedingText , stateCandidate, trailingText }
 }
-
 
 /**
  * Highlights a single span element with state coloring based on mode.
@@ -283,7 +290,7 @@ async function processSpan(span) {
 	span.dataset.originalText = originalText;
 	
 	// Separate our city and state and any trailing information along with it
-	const { city , stateCandidate, trailing } = processLocation(originalText);
+	const { preceedingText , stateCandidate, trailingText } = processLocation(originalText);
 	
 	// Check if our state is in the score listing
 	const entry =
@@ -297,8 +304,8 @@ async function processSpan(span) {
 	// Clear and reconstruct the span content
 	span.textContent = "";
 	// Add city and comma if city exists
-	if (city) {
-		span.appendChild(document.createTextNode(city + ", "));
+	if (preceedingText) {
+		span.appendChild(document.createTextNode(preceedingText));
 	}
 
 	// Add colored and formatted state span element
@@ -310,6 +317,12 @@ async function processSpan(span) {
 	stateSpan.style.color = "white";
 	stateSpan.style.outline = "1px solid black"
 	span.appendChild(stateSpan);
+	
+	// Add any remaining trailing info if it exists
+	if (trailingText) {
+		span.appendChild(document.createTextNode(trailingText))
+	}
+	
 	// Tooltips section
 	if (tooltipsEnabled) { // Add a tooltip if enabled (default = true)
 		const tooltipText = `${stateCandidate} — MAP score: ${score.toFixed(2)}`;
@@ -317,10 +330,5 @@ async function processSpan(span) {
 		stateSpan.dataset.tooltipContent = tooltipText;
 		stateSpan.dataset.tooltipApplied = "true";
 		//console.log("[Equality Compass] Processing tooltip " + tooltipText);
-	}
-
-	// Add any remaining trailing info if it exists
-	if (trailing) {
-		span.appendChild(document.createTextNode(trailing));
 	}
 }
