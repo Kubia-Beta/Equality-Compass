@@ -3,7 +3,7 @@ An in-development Firefox plugin that scans job sites for the United States and 
 
 # Advanced Information
 + No use of innerHTML, the locations are processed as plaintext. When inserted, it is not executed as code, avoiding most XSS attempts (if LinkedIn is putting XSS attacks as location data, we have bigger issues).
-+ Styling and Tooltips are both hardcoded to prevent injection.
++ Styling, Tooltips, and Location data are all hardcoded to prevent injection.
 + No remote code, everything is local to the machine.
 
 # Installation
