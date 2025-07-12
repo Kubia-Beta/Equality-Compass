@@ -1,6 +1,6 @@
 /**
  * Job State Coloring Content Script
- * Colors listings of job postings by their state according to their equalitymaps color.
+ * Colors listings of job postings by their state according to their Equalitymaps color.
  * Handles dynamic content loading, SPA navigation, and mode toggling.
  * Currently supports Indeed, LinkedIn, and ZipRecruiter.
  *
@@ -112,7 +112,7 @@ const observer = new MutationObserver((mutations) => {
 // Begin observing the entire body for dynamically injected listings
 observer.observe(document.body, {
 	childList: true,
-	subtree: true // Important: LinkedIn deeply injects content
+	subtree: true
 });
 
 
