@@ -7,7 +7,7 @@ An in-development Firefox plugin that scans job sites for the United States and 
 + No remote code, everything is local to the machine.
 
 # Installation
-To install this development build for Firefox, grab either the latest alpha release or download this repository as a ZIP file. Once you have the file, navigate to about:debugging#/runtime/this-firefox and load this as a temporary addon by selecting the ZIP.
+To install this development build for Firefox, grab either the latest alpha release or download this repository from Main as a ZIP file. Once you have the file, navigate to about:debugging#/runtime/this-firefox and load this as a temporary addon by selecting the ZIP.
 
 # FAQ
 > Where is the Chrome version?
