@@ -178,91 +178,54 @@ function applyZiprecruiterColoring() {
 // Parsing and Coloring logic
 //============================================================================
 
+function findFirstMatchingState(span, mode) {
+  const states = window.stateScores[mode];
+
+  for (const key of Object.keys(states)) {
+    const regex = new RegExp(`\\b${key}\\b`, 'i'); // match whole word, case-insensitive
+    const match = span.match(regex);
+
+    if (match) {
+      const { colorGrade, score } = states[key];
+      return {
+        match: match[0],
+        index: match.index,
+        colorGrade,
+        score
+      };
+    }
+  }
+
+  // No match found
+  return null;
+}
+
+
+
 /**
- * Processes the text of a location into relevant city and state parts.
+ * Processes a span into a matching state and surrounding text using a regular expression.
  * @param originalText, the text object we are trying to process
  * @return { precedingText , stateCandidate, trailingText }, an object containing the processed location parts.
  */
-function processLocation(originalText){
-	// Separate trailing info like (Remote), (On-site), etc.
-	const parenIndex = originalText.indexOf(" ("); // FIXME: Fails on "Gravitas Recruitment Group (Global) Ltd · x"
-	// Check where the parenthesis are and assign it in a ternary if/else: if parenIndex check, true : false
-	const locationPart = parenIndex !== -1 ? originalText.slice(0, parenIndex) : originalText;
-	const parts = locationPart.split(",").map(p => p.trim()); // Split by comma and trim whitespace
-
-	let stateCandidate = null;
-
-	// Handle formats: City, State or State, United States or City, State, United States
-	if (parts.length === 3) {
-		// ex. Remote in, Remote from, etc.
-		if (parts[0] === "Remote") { 
-			stateCandidate = parts [2]
+function processLocation(originalText, mode){
+	const states = window.stateScores[mode];
+	let stateLocation = 0;
+	let stateCandidate = "";
+	
+	// Sort the keys from stateScores.js to match abbreviations first
+	const sortedKeys = Object.keys(states).sort((a, b) => b.length - a.length);
+	
+	for (const key of sortedKeys) {
+		const regex = new RegExp(`\\b${key}\\b`, 'i'); // match whole word, case-insensitive
+		const match = originalText.match(regex);
+		if (match) {
+			stateCandidate = match[0];
+			stateLocation = match.index;
 		}
-		else if (parts[2] === "USA" || parts[2] === "United States") { // city, state, USA
-			stateCandidate = parts[1];
-		}
-		else { // Phoenix, AZ, U.S.
-			city = parts[0];
-			stateCandidate = parts[1];
-		}
-		
-	}
-	else if (parts.length === 2) {
-		if (parts[1] === "United States"
-			|| parts[1] === "US"
-			|| parts[1] === "U.S.") 
-			{ // ex. Nevada, United States
-			stateCandidate = parts[0];
-		}
-		// FIXME: Tracking logic that grabs these entities on LinkedIn
-		else if (parts[0].includes("·")){ // "company · city, state · $pay" & similar
-			const dotIndex = parts[0].indexOf("·");
-			const usCheck = parts[1].split(" ");
-			if (usCheck === "United" || "US" || "U.S.") {
-				stateCandidate = parts[0].slice(dotIndex+1); // Leading space after dot
-			}
-			else {
-				stateCandidate = parts[1];
-			}
-		}
-		else if (/\d/.test(parts[1])){ // has numeric, so city, state zip
-			// Find where the zip begins
-			const zipIndex = parts[1].search(/[0-9]/);
-			// Assign the state without the leading whitespace before the zip
-			stateCandidate = parts[1].substring(0, (zipIndex - 1));
-		}
-		else { // ex. Phoenix, Arizona
-			stateCandidate = parts[1];
-		}
-	}
-	else if (parts.length === 1) { // Handle cases for "remote in X", "hybrid work in X", 
-		// split into substring by space
-		const spaceParts = locationPart.split(" ").map(p => p.trim()); // Split by space
-		let testSubstring = spaceParts[spaceParts.length - 2]; // Access the second to last substring
-		
-		const validSingleSpaceLocations = ["new", "north", "rhode", "south", "west", "american", "puerto"];
-		const validDoubleSpaceLocations = ["mariana", "virgin"];
-		
-		if (validSingleSpaceLocations.includes(testSubstring)) {
-			// ex. puerto + " " + rico, stateCandidate = "Puerto Rico"
-			stateCandidate = spaceParts[spaceParts.length - 2] + " " + spaceParts[spaceParts.length - 1];
-		}
-		else if (validDoubleSpaceLocations.includes(testSubstring)) {
-			// ex. "U.S. Virgin Islands"
-			stateCandidate = spaceParts[spaceParts.length - 3] + " " + 
-			spaceParts[spaceParts.length - 2] + " " + spaceParts[spaceParts.length - 1];
-		}
-		else { // Remote in X
-			stateCandidate = spaceParts[spaceParts.length - 1];
-		}
-	}
-	else {
-		stateCandidate = parts[0];
 	}
 	
 	// construct the surrounding text
 	let reconstructor = originalText;
-	const stateLocation = reconstructor.indexOf(stateCandidate);
 	const precedingText = reconstructor.slice(0, stateLocation);
 	const trailingText = reconstructor.slice(stateLocation + stateCandidate.length);
 	
@@ -287,7 +250,7 @@ async function processSpan(span) {
 	span.dataset.originalText = originalText;
 	
 	// Separate our city and state and any trailing information along with it
-	const { precedingText , stateCandidate, trailingText } = processLocation(originalText);
+	const { precedingText , stateCandidate, trailingText } = processLocation(originalText, mode);
 	
 	// Check if our state is in the score listing
 	const entry =
