@@ -166,7 +166,7 @@ function applyLinkedinColoring() {
  * Recolors all visible job listing location spans on the page on Ziprecruiter.
  */
 function applyZiprecruiterColoring() {
-	const locationSpans = document.querySelectorAll("[data-testid='job-card-location']"); // Identifier data
+	const locationSpans = document.querySelectorAll("[data-testid='job-card-location'], .company_location"); // Identifier data
 	locationSpans.forEach(span => {
 		if (!span.dataset.processed) {
 			span.dataset.processed = "true";
@@ -226,11 +226,12 @@ function processLocation(originalText){
 		// split into substring by space
 		const spaceParts = locationPart.split(" ").map(p => p.trim()); // Split by space
 		const testSubstring = spaceParts[spaceParts.length - 2]; // Access the second to last substring
+		
 		const validSingleSpaceLocations = ["new", "north", "rhode", "south", "west", "american", "puerto"];
 		const validDoubleSpaceLocations = ["mariana", "virgin"];
 		
 		if (validSingleSpaceLocations.includes(testSubstring)) {
-			// ex. puerto + " " rico, stateCandidate = "Puerto Rico"
+			// ex. puerto + " " + rico, stateCandidate = "Puerto Rico"
 			stateCandidate = spaceParts[spaceParts.length - 2] + " " + spaceParts[spaceParts.length - 1];
 		}
 		else if (validDoubleSpaceLocations.includes(testSubstring)) {
@@ -238,7 +239,7 @@ function processLocation(originalText){
 			stateCandidate = spaceParts[spaceParts.length - 3] + " " + 
 			spaceParts[spaceParts.length - 2] + " " + spaceParts[spaceParts.length - 1];
 		}
-		else { // Remote in 
+		else { // Remote in X
 			stateCandidate = spaceParts[spaceParts.length - 1];
 		}
 	}
