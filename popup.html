@@ -1,6 +1,6 @@
 <!--
-Front end logic for the addon's "popup" or "addon" tab when the icon is clicked.
-Front end calls the backend, popup.js, to store and transmit information to the addon.
+Front end logic for the addon's "popup" or "addon" tab when the icon is clicked or selected in the addon menu.
+Triggers popup.js listeners to store information to the addon.
  --> 
 
 <!DOCTYPE html>
@@ -16,7 +16,7 @@ Front end calls the backend, popup.js, to store and transmit information to the 
 	</div>
 
 	<div class="switch-container">
-		<span class="switch-label">Gender Identity Mode</span>
+		<span class="switch-label">Gender Identity Only</span>
 		<label class="switch">
 			<input type="checkbox" id="modeToggle">
 			<span class="slider"></span>
@@ -54,5 +54,6 @@ Front end calls the backend, popup.js, to store and transmit information to the 
 	</div>
 
 	<script src="popup.js"></script>
+
 </body>
 </html>

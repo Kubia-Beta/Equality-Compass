@@ -13,7 +13,9 @@
  */
 
 
+//============================================================================
 // Startup
+//============================================================================
 console.log("[Equality Compass] Content script loaded");
 
 /**
@@ -35,10 +37,13 @@ else if (window.location.hostname.includes("ziprecruiter.com")) {
 	applyZiprecruiterColoring();
 }
 
+//============================================================================
+// Observer Logic
+//============================================================================
 
 /**
- * Listen for messages from the popup to reprocess listings when the user changes addon settings.
- * Settings: Overall Tally/Gender Identity Tally mode, Tooltips on/off.
+ * Locally listen for messages from the background script to reprocess locations when the user changes addon settings.
+ * @param msg, the .sendMessage from the background script
  */
 browser.runtime.onMessage.addListener((msg) => {
 	if (msg.type === "modeChanged") {
@@ -47,14 +52,7 @@ browser.runtime.onMessage.addListener((msg) => {
 		document.querySelectorAll('[data-processed="true"]').forEach(el => {
 			el.removeAttribute("data-processed");
 		});
-		colorHelper(); // Recolor all current listings with new mode
-	}
-	else if (msg.type === "tooltipChanged"){
-		console.log("[Equality Compass] Tooltips changed — reprocessing all visible spans");
-		document.querySelectorAll('[data-processed="true"]').forEach(el => {
-			el.removeAttribute("data-processed");
-		});
-		colorHelper(); // Reprocess all current listings
+		colorHelper(); // Recolor all current locations with new mode
 	}
 });
 
@@ -115,6 +113,9 @@ observer.observe(document.body, {
 	subtree: true
 });
 
+//============================================================================
+// Selection Logic
+//============================================================================
 
 /**
  * Color helper function. Call to color any of the supported areas in the United States.
@@ -132,13 +133,11 @@ function colorHelper(){
 	}
 }
 
-
 /**
- * Recolors all visible job listing location spans on the page on Indeed.
- * Uses a querySelectorAll to find matching spans that haven't been processed.
+ * Traverses the provided span and marks it as processed.
+ * @param locationSpans, a list of spans to traverse.
  */
-function applyIndeedColoring() {
-	const locationSpans = document.querySelectorAll('div[data-testid="text-location"]');
+function spanWalker(locationSpans) {
 	locationSpans.forEach(span => {
 		if (!span.dataset.processed) {
 			span.dataset.processed = "true";
@@ -149,16 +148,21 @@ function applyIndeedColoring() {
 
 
 /**
+ * Recolors all visible job listing location spans on the page on Indeed.
+ * Uses a querySelectorAll to find matching spans.
+ */
+function applyIndeedColoring() {
+	const locationSpans = document.querySelectorAll('div[data-testid="text-location"]');
+	spanWalker(locationSpans)
+}
+
+
+/**
  * Recolors all visible job listing location spans on the page on LinkedIn.
  */
 function applyLinkedinColoring() {
-	const locationSpans = document.querySelectorAll('.artdeco-entity-lockup__caption span[dir="ltr"]'); // Identifier class
-	locationSpans.forEach(span => {
-		if (!span.dataset.processed) {
-			span.dataset.processed = "true";
-			processSpan(span);
-		}
-	});
+	let locationSpans = document.querySelectorAll('.artdeco-entity-lockup__caption span[dir="ltr"]'); // Identifier class
+	spanWalker(locationSpans)
 }
 
 
@@ -167,14 +171,12 @@ function applyLinkedinColoring() {
  */
 function applyZiprecruiterColoring() {
 	const locationSpans = document.querySelectorAll("[data-testid='job-card-location'], .company_location"); // Identifier data
-	locationSpans.forEach(span => {
-		if (!span.dataset.processed) {
-			span.dataset.processed = "true";
-			processSpan(span);
-		}
-	});
+	spanWalker(locationSpans)
 }
 
+//============================================================================
+// Parsing and Coloring logic
+//============================================================================
 
 /**
  * Processes the text of a location into relevant city and state parts.
@@ -183,7 +185,7 @@ function applyZiprecruiterColoring() {
  */
 function processLocation(originalText){
 	// Separate trailing info like (Remote), (On-site), etc.
-	const parenIndex = originalText.indexOf(" (");
+	const parenIndex = originalText.indexOf(" ("); // FIXME: Fails on "Gravitas Recruitment Group (Global) Ltd · x"
 	// Check where the parenthesis are and assign it in a ternary if/else: if parenIndex check, true : false
 	const locationPart = parenIndex !== -1 ? originalText.slice(0, parenIndex) : originalText;
 	const parts = locationPart.split(",").map(p => p.trim()); // Split by comma and trim whitespace
@@ -212,6 +214,17 @@ function processLocation(originalText){
 			{ // ex. Nevada, United States
 			stateCandidate = parts[0];
 		}
+		// FIXME: Tracking logic that grabs these entities on LinkedIn
+		else if (parts[0].includes("·")){ // "company · city, state · $pay" & similar
+			const dotIndex = parts[0].indexOf("·");
+			const usCheck = parts[1].split(" ");
+			if (usCheck === "United" || "US" || "U.S.") {
+				stateCandidate = parts[0].slice(dotIndex+1); // Leading space after dot
+			}
+			else {
+				stateCandidate = parts[1];
+			}
+		}
 		else if (/\d/.test(parts[1])){ // has numeric, so city, state zip
 			// Find where the zip begins
 			const zipIndex = parts[1].search(/[0-9]/);
@@ -222,10 +235,10 @@ function processLocation(originalText){
 			stateCandidate = parts[1];
 		}
 	}
-	else if (parts.length === 1) { // Handle cases for "remote in X", "hybrid work in X"
+	else if (parts.length === 1) { // Handle cases for "remote in X", "hybrid work in X", 
 		// split into substring by space
 		const spaceParts = locationPart.split(" ").map(p => p.trim()); // Split by space
-		const testSubstring = spaceParts[spaceParts.length - 2]; // Access the second to last substring
+		let testSubstring = spaceParts[spaceParts.length - 2]; // Access the second to last substring
 		
 		const validSingleSpaceLocations = ["new", "north", "rhode", "south", "west", "american", "puerto"];
 		const validDoubleSpaceLocations = ["mariana", "virgin"];
