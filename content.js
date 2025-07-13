@@ -216,7 +216,7 @@ function processLocation(originalText, mode){
 	const sortedKeys = Object.keys(states).sort((a, b) => b.length - a.length);
 	
 	for (const key of sortedKeys) {
-		const regex = new RegExp(`\\b${key}\\b`, 'i'); // match whole word, case-insensitive
+		const regex = new RegExp(`\\b${key}\\b`); // match whole word
 		const match = originalText.match(regex);
 		if (match) {
 			stateCandidate = match[0];
