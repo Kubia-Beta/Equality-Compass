@@ -13,7 +13,9 @@
  */
 
 
+//============================================================================
 // Startup
+//============================================================================
 console.log("[Equality Compass] Content script loaded");
 
 /**
@@ -35,10 +37,13 @@ else if (window.location.hostname.includes("ziprecruiter.com")) {
 	applyZiprecruiterColoring();
 }
 
+//============================================================================
+// Observer Logic
+//============================================================================
 
 /**
- * Listen for messages from the popup to reprocess listings when the user changes addon settings.
- * Settings: Overall Tally/Gender Identity Tally mode, Tooltips on/off.
+ * Locally listen for messages from the background script to reprocess locations when the user changes addon settings.
+ * @param msg, the .sendMessage from the background script
  */
 browser.runtime.onMessage.addListener((msg) => {
 	if (msg.type === "modeChanged") {
@@ -47,14 +52,7 @@ browser.runtime.onMessage.addListener((msg) => {
 		document.querySelectorAll('[data-processed="true"]').forEach(el => {
 			el.removeAttribute("data-processed");
 		});
-		colorHelper(); // Recolor all current listings with new mode
-	}
-	else if (msg.type === "tooltipChanged"){
-		console.log("[Equality Compass] Tooltips changed — reprocessing all visible spans");
-		document.querySelectorAll('[data-processed="true"]').forEach(el => {
-			el.removeAttribute("data-processed");
-		});
-		colorHelper(); // Reprocess all current listings
+		colorHelper(); // Recolor all current locations with new mode
 	}
 });
 
@@ -74,25 +72,39 @@ const observer = new MutationObserver((mutations) => {
 	for (const mutation of mutations) {
 		for (const node of mutation.addedNodes) {
 			if (!(node instanceof HTMLElement)) continue; // Skip non-element nodes
-			if (window.location.href.includes("linkedin")) {
-				// Check if the node itself or its descendants match our target linkedin span
-				const spans = node.matches?.('span[dir="ltr"]')
-					? [node] // Node is directly the target span
-					: node.querySelectorAll?.('span[dir="ltr"]') || []; // Or search inside it
+			if (window.location.href.includes("linkedin.com")) {
+				if (window.location.href.includes("linkedin.com.jobs/*")){ // Jobs search
+					// Check if the node itself or its descendants match our target linkedin span
+					const spans = node.matches?.('span[dir="ltr"]')
+						? [node] // Node is directly the target span
+						: node.querySelectorAll?.('span[dir="ltr"]') || []; // Or search inside it
 
-				spans.forEach(span => {
-					// Only handle spans within job location components
-					const parent = span.closest('.artdeco-entity-lockup__caption');
-					if (parent && !span.dataset.processed) {
-					span.dataset.processed = "true"; // Mark as processed
-					processSpan(span); // Apply highlighting
-					}
-				});
-			} else if (window.location.href.includes("ziprecruiter")){
-				// Check if the node itself or its descendants match our target ZipRecruiter span
+					spans.forEach(span => {
+						// Only handle spans within job location components
+						const parent = span.closest('.artdeco-entity-lockup__caption');
+						if (parent && !span.dataset.processed) {
+						span.dataset.processed = "true"; // Mark as processed
+						processSpan(span); // Apply highlighting
+						}
+					});
+				} else { // Not a job Search
+					const spans = node.matches?.('div[dir="ltr"')
+						? [node] 
+						: node.querySelectorAll?.('div[dir="ltr"') || []; 
+						
+					spans.forEach(span => {
+						const parent = span.closest('.artdeco-entity-lockup__subtitle');
+						if (parent && !span.dataset.processed) {
+						span.dataset.processed = "true";
+						processSpan(span);
+						}
+					});
+				}
+			}
+			else if (window.location.href.includes("ziprecruiter")){
 				const spans = node.matches?.("[data-testid='job-card-location']")
 					? [node] 
-					: node.querySelectorAll?.("[data-testid='job-card-location']") || []; // Or search inside it
+					: node.querySelectorAll?.("[data-testid='job-card-location']") || [];
 					
 				setTimeout(function(){ // Delay to prevent the highlighted span from popping in and out during SPA changes
 					spans.forEach(span => { // ZipRecruiter dynamically changes the page multiple times when you click a job
@@ -115,6 +127,9 @@ observer.observe(document.body, {
 	subtree: true
 });
 
+//============================================================================
+// Selection Logic
+//============================================================================
 
 /**
  * Color helper function. Call to color any of the supported areas in the United States.
@@ -132,19 +147,27 @@ function colorHelper(){
 	}
 }
 
-
 /**
- * Recolors all visible job listing location spans on the page on Indeed.
- * Uses a querySelectorAll to find matching spans that haven't been processed.
+ * Traverses the provided span and marks it as processed.
+ * @param locationSpans, a list of spans to traverse.
  */
-function applyIndeedColoring() {
-	const locationSpans = document.querySelectorAll('div[data-testid="text-location"]');
+function spanWalker(locationSpans) {
 	locationSpans.forEach(span => {
 		if (!span.dataset.processed) {
 			span.dataset.processed = "true";
 			processSpan(span);
 		}
 	});
+}
+
+
+/**
+ * Recolors all visible job listing location spans on the page on Indeed.
+ * Uses a querySelectorAll to find matching spans.
+ */
+function applyIndeedColoring() {
+	const locationSpans = document.querySelectorAll('div[data-testid="text-location"]');
+	spanWalker(locationSpans)
 }
 
 
@@ -152,13 +175,14 @@ function applyIndeedColoring() {
  * Recolors all visible job listing location spans on the page on LinkedIn.
  */
 function applyLinkedinColoring() {
-	const locationSpans = document.querySelectorAll('.artdeco-entity-lockup__caption span[dir="ltr"]'); // Identifier class
-	locationSpans.forEach(span => {
-		if (!span.dataset.processed) {
-			span.dataset.processed = "true";
-			processSpan(span);
-		}
-	});
+	let locationSpans = document.querySelectorAll('.artdeco-entity-lockup__caption span[dir="ltr"]'); // Identifier class
+	if (window.location.href.includes("linkedin.com.jobs/*")){ // Jobs search
+		spanWalker(locationSpans);
+	}
+	else { // Jobs page
+		locationSpans = document.querySelectorAll('.artdeco-entity-lockup__subtitle div[dir="ltr"]');
+		spanWalker(locationSpans);
+	}
 }
 
 
@@ -166,89 +190,61 @@ function applyLinkedinColoring() {
  * Recolors all visible job listing location spans on the page on Ziprecruiter.
  */
 function applyZiprecruiterColoring() {
-	const locationSpans = document.querySelectorAll("[data-testid='job-card-location']"); // Identifier data
-	locationSpans.forEach(span => {
-		if (!span.dataset.processed) {
-			span.dataset.processed = "true";
-			processSpan(span);
-		}
-	});
+	const locationSpans = document.querySelectorAll("[data-testid='job-card-location'], .company_location"); // Identifier data
+	spanWalker(locationSpans)
+}
+
+//============================================================================
+// Parsing and Coloring logic
+//============================================================================
+
+function findFirstMatchingState(span, mode) {
+  const states = window.stateScores[mode];
+
+  for (const key of Object.keys(states)) {
+    const regex = new RegExp(`\\b${key}\\b`, 'i'); // match whole word, case-insensitive
+    const match = span.match(regex);
+
+    if (match) {
+      const { colorGrade, score } = states[key];
+      return {
+        match: match[0],
+        index: match.index,
+        colorGrade,
+        score
+      };
+    }
+  }
+
+  // No match found
+  return null;
 }
 
 
 /**
- * Processes the text of a location into relevant city and state parts.
+ * Processes a span into a matching state and surrounding text using a regular expression.
  * @param originalText, the text object we are trying to process
  * @return { precedingText , stateCandidate, trailingText }, an object containing the processed location parts.
  */
-function processLocation(originalText){
-	// Separate trailing info like (Remote), (On-site), etc.
-	const parenIndex = originalText.indexOf(" (");
-	// Check where the parenthesis are and assign it in a ternary if/else: if parenIndex check, true : false
-	const locationPart = parenIndex !== -1 ? originalText.slice(0, parenIndex) : originalText;
-	const parts = locationPart.split(",").map(p => p.trim()); // Split by comma and trim whitespace
-
-	let stateCandidate = null;
-
-	// Handle formats: City, State or State, United States or City, State, United States
-	if (parts.length === 3) {
-		// ex. Remote in, Remote from, etc.
-		if (parts[0] === "Remote") { 
-			stateCandidate = parts [2]
+function processLocation(originalText, mode){
+	const states = window.stateScores[mode];
+	let stateLocation = 0;
+	let stateCandidate = "";
+	
+	// Sort the keys from stateScores.js to match abbreviations first
+	const sortedKeys = Object.keys(states).sort((a, b) => b.length - a.length);
+	
+	for (const key of sortedKeys) {
+		const regex = new RegExp(`\\b${key}\\b`); // match whole word
+		const match = originalText.match(regex);
+		if (match) {
+			stateCandidate = match[0];
+			stateLocation = match.index;
 		}
-		else if (parts[2] === "USA" || parts[2] === "United States") { // city, state, USA
-			stateCandidate = parts[1];
-		}
-		else { // Phoenix, AZ, U.S.
-			city = parts[0];
-			stateCandidate = parts[1];
-		}
-		
-	}
-	else if (parts.length === 2) {
-		if (parts[1] === "United States"
-			|| parts[1] === "US"
-			|| parts[1] === "U.S.") 
-			{ // ex. Nevada, United States
-			stateCandidate = parts[0];
-		}
-		else if (/\d/.test(parts[1])){ // has numeric, so city, state zip
-			// Find where the zip begins
-			const zipIndex = parts[1].search(/[0-9]/);
-			// Assign the state without the leading whitespace before the zip
-			stateCandidate = parts[1].substring(0, (zipIndex - 1));
-		}
-		else { // ex. Phoenix, Arizona
-			stateCandidate = parts[1];
-		}
-	}
-	else if (parts.length === 1) { // Handle cases for "remote in X", "hybrid work in X"
-		// split into substring by space
-		const spaceParts = locationPart.split(" ").map(p => p.trim()); // Split by space
-		const testSubstring = spaceParts[spaceParts.length - 2]; // Access the second to last substring
-		const validSingleSpaceLocations = ["new", "north", "rhode", "south", "west", "american", "puerto"];
-		const validDoubleSpaceLocations = ["mariana", "virgin"];
-		
-		if (validSingleSpaceLocations.includes(testSubstring)) {
-			// ex. puerto + " " rico, stateCandidate = "Puerto Rico"
-			stateCandidate = spaceParts[spaceParts.length - 2] + " " + spaceParts[spaceParts.length - 1];
-		}
-		else if (validDoubleSpaceLocations.includes(testSubstring)) {
-			// ex. "U.S. Virgin Islands"
-			stateCandidate = spaceParts[spaceParts.length - 3] + " " + 
-			spaceParts[spaceParts.length - 2] + " " + spaceParts[spaceParts.length - 1];
-		}
-		else { // Remote in 
-			stateCandidate = spaceParts[spaceParts.length - 1];
-		}
-	}
-	else {
-		stateCandidate = parts[0];
 	}
 	
 	// construct the surrounding text
 	let reconstructor = originalText;
-	const stateLocation = reconstructor.indexOf(stateCandidate);
 	const precedingText = reconstructor.slice(0, stateLocation);
 	const trailingText = reconstructor.slice(stateLocation + stateCandidate.length);
 	
@@ -273,7 +269,7 @@ async function processSpan(span) {
 	span.dataset.originalText = originalText;
 	
 	// Separate our city and state and any trailing information along with it
-	const { precedingText , stateCandidate, trailingText } = processLocation(originalText);
+	const { precedingText , stateCandidate, trailingText } = processLocation(originalText, mode);
 	
 	// Check if our state is in the score listing
 	const entry =

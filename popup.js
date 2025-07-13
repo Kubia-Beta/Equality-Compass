@@ -1,9 +1,12 @@
 /**
- * This content drives the logic behind the "popup" or "addon" menu.
- * Stores and retrieves relevent addon settings and pushes those settings to content.js.
+ * This content drives the logic behind the "popup" or "addon" menu,
+ * and is responsible for storing and retrieving relevent addon settings.
+ * Triggers background.js listeners when storing local information.
  */
-
-// Gender Identity Toggle
+ 
+//============================================================================
+// Mode Logic
+//============================================================================
 const toggle = document.getElementById("modeToggle");
 
 // Load saved setting from storage
@@ -11,21 +14,20 @@ browser.storage.local.get("mode").then(({ mode }) => {
 	toggle.checked = mode === "GenderIdentityTally";
 });
 
-// Listen for changes to the Aggregate/GI toggle
+
+/**
+ * Listen for changes to the OverallTally/GenderIdentityTally toggle. Defaults to OFF.
+ * @param toggle, the output of the switch container for which mode to use sent to const "modeToggle"
+ */
 toggle.addEventListener("change", () => {
 	const newMode = toggle.checked ? "GenderIdentityTally" : "OverallTally";
-	browser.storage.local.set({ mode: newMode }).then(() => {
-		// Send message to active tab
-		browser.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
-			if (tabs[0]?.id) {
-				browser.tabs.sendMessage(tabs[0].id, { type: "modeChanged" });
-			}
-		});
-	});
+	browser.storage.local.set({ mode: newMode });
 });
 
 
-// Tooltip Toggle
+//============================================================================
+// Tooltip logic
+//============================================================================
 const tooltipToggle = document.getElementById("tooltipToggle");
 
 // Load saved setting from storage
@@ -33,17 +35,12 @@ browser.storage.local.get("tooltipsEnabled").then(({ tooltipsEnabled }) => {
 	tooltipToggle.checked = tooltipsEnabled !== false; // default is ON
 });
 
-// Listen for changes to the tooltip toggle
+
+/**
+ * Listen for changes to the tooltip toggle. Defaults to ON.
+ * @param toggle, the output of the switch container for which mode to use sent to const "tooltipToggle"
+ */
 tooltipToggle.addEventListener("change", () => {
 	const enabled = tooltipToggle.checked;
-	browser.storage.local.set({ tooltipsEnabled: enabled }).then(() => {
-		browser.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
-			if (tabs[0]?.id) {
-			browser.tabs.sendMessage(tabs[0].id, {
-				type: "tooltipChanged",
-				enabled
-				});
-			}
-		});
-	});
+	browser.storage.local.set({ tooltipsEnabled: enabled });
 });
