@@ -162,7 +162,9 @@ function applyIndeedColoring() {
  */
 function applyLinkedinColoring() {
 	let locationSpans = document.querySelectorAll('.artdeco-entity-lockup__caption span[dir="ltr"]'); // Identifier class
-	spanWalker(locationSpans)
+	spanWalker(locationSpans);
+	locationSpans = document.querySelectorAll('.artdeco-entity-lockup__subtitle div[dir="ltr"]');
+	spanWalker(locationSpans);
 }
 
 
@@ -199,7 +201,6 @@ function findFirstMatchingState(span, mode) {
   // No match found
   return null;
 }
-
 
 
 /**
