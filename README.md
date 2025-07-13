@@ -12,7 +12,7 @@ To install this development build for Firefox, grab either the latest alpha rele
 # FAQ
 > Where is the Chrome version?
 
-Planned. I want to be more release-ready before I port this over to Chrome as well.
+Planned. I want to be more release-ready before I port this over to Chrome as well. It's my first Chrome addon, so I have to pay a fee.
 
 > When will this release?
 
