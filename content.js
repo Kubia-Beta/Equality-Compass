@@ -199,21 +199,17 @@ function applyZiprecruiterColoring() {
 //============================================================================
 
 function findFirstMatchingState(span, mode) {
-  const states = window.stateScores[mode];
+	const states = window.stateScores[mode];
 
-  for (const key of Object.keys(states)) {
-    const regex = new RegExp(`\\b${key}\\b`, 'i'); // match whole word, case-insensitive
-    const match = span.match(regex);
+	for (const key of Object.keys(states)) {
+		const regex = new RegExp(`\\b${key}\\b`, 'i'); // match whole word, case-insensitive
+		const match = span.match(regex);
 
-    if (match) {
-      const { colorGrade, score } = states[key];
-      return {
-        match: match[0],
-        index: match.index,
-        colorGrade,
-        score
-      };
-    }
+	if (match) {
+		const { colorGrade, score } = states[key];
+		return { match: match[0], index: match.index,
+				colorGrade, score };
+	}
   }
 
   // No match found
