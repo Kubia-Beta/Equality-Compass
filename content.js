@@ -176,7 +176,7 @@ function applyIndeedColoring() {
  */
 function applyLinkedinColoring() {
 	let locationSpans = document.querySelectorAll('.artdeco-entity-lockup__caption span[dir="ltr"]'); // Identifier class
-	if (window.location.href.includes("linkedin.com.jobs/*")){ // Jobs search
+	if (window.location.href.includes("linkedin.com/jobs/search")){ // Jobs search
 		spanWalker(locationSpans);
 	}
 	else { // Jobs page
