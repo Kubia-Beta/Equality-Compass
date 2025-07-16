@@ -7,7 +7,7 @@ To install this development build for Firefox, grab either the latest alpha rele
 # Advanced Information
 Works by searching for specific spans and divs that each respective website uses to hold the location information of their job listings. A window of the state information runs in the background for the regex to pull matches from, which then get passed on to the span processing functions to remove the original text and reconstruct it but with the state on a colored background.
 
-+ No use of innerHTML, the locations are processed as plaintext. When inserted, it is not executed as code, avoiding most XSS attempts (if LinkedIn is putting XSS attacks as location data, we have bigger issues).
++ No use of innerHTML, the locations are processed as plaintext using textContent. When inserted, it is not executed as code, avoiding most XSS attempts (if LinkedIn is putting XSS attacks as location data, we have bigger issues).
 + Styling, Tooltips, and Location data are all hardcoded to prevent injection.
 + No remote code, everything is local to the machine.
 
