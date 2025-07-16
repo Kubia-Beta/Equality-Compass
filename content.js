@@ -75,7 +75,6 @@ const observer = new MutationObserver((mutations) => {
 			if (window.location.href.includes("linkedin.com")) {
 				if (window.location.href.includes("linkedin.com/jobs/search")){ // Jobs search
 					// Check if the node itself or its descendants match our target linkedin span
-					console.log("A");
 					const spans = node.matches?.('span[dir="ltr"]')
 						? [node] // Node is directly the target span
 						: node.querySelectorAll?.('span[dir="ltr"]') || []; // Or search inside it
@@ -89,7 +88,6 @@ const observer = new MutationObserver((mutations) => {
 						}
 					});
 				} else { // Not a job Search
-					console.log("B");
 					const spans = node.matches?.('div[dir="ltr"')
 						? [node] 
 						: node.querySelectorAll?.('div[dir="ltr"') || []; 
