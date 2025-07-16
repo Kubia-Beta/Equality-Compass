@@ -1,6 +1,6 @@
 /**
- * This content drives the logic behind the "popup" or "addon" menu,
- * and is responsible for storing and retrieving relevent addon settings.
+ * This content drives the logic behind the "popup" or "extension" menu,
+ * and is responsible for storing and retrieving relevent extension settings.
  * Triggers background.js listeners when storing local information.
  */
  
@@ -12,6 +12,7 @@ const toggle = document.getElementById("modeToggle");
 // Load saved setting from storage
 browser.storage.local.get("mode").then(({ mode }) => {
 	toggle.checked = mode === "GenderIdentityTally";
+	processPopupTooltips();
 });
 
 
@@ -22,6 +23,7 @@ browser.storage.local.get("mode").then(({ mode }) => {
 toggle.addEventListener("change", () => {
 	const newMode = toggle.checked ? "GenderIdentityTally" : "OverallTally";
 	browser.storage.local.set({ mode: newMode });
+	processPopupTooltips();
 });
 
 
@@ -44,3 +46,41 @@ tooltipToggle.addEventListener("change", () => {
 	const enabled = tooltipToggle.checked;
 	browser.storage.local.set({ tooltipsEnabled: enabled });
 });
+
+
+//============================================================================
+// Dynamic popup logic
+//============================================================================
+
+/**
+ * Changes popup.html tooltips when called based on the current mode (Overall/GI).
+ */
+async function processPopupTooltips(){
+	const { mode = "OverallTally"} = await browser.storage.local.get(["mode"]);
+	const scoreValues = scoreBreakpoints[mode];
+	let popupDivs = document.querySelectorAll('.legend-item');
+	
+	popupDivs.forEach(div => {
+		let newTitle = scoreValues[div.id];
+		div.setAttribute('title', newTitle);
+	});
+}
+
+// Holds the scores designated by the Movement Advancement Project as thresholds for their different tiers.
+const scoreBreakpoints = {
+	OverallTally: {
+		"high": "\u2265 36.75", // Greater than or equal to unicode character code
+		"medium": "\u2265 24.5",
+		"fair": "\u2265 12.25",
+		"low": "\u2265 0",
+		"negative": "\u003C 0" // Less than unicode character code
+	},
+
+	GenderIdentityTally: {
+		"high": "\u2265 19.5",
+		"medium": "\u2265 13",
+		"fair": "\u2265 6",
+		"low": "\u2265 0",
+		"negative": "\u003C 0"
+	}
+};

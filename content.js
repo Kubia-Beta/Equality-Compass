@@ -42,12 +42,12 @@ else if (window.location.hostname.includes("ziprecruiter.com")) {
 //============================================================================
 
 /**
- * Locally listen for messages from the background script to reprocess locations when the user changes addon settings.
+ * Locally listen for messages from the background script to reprocess locations when the user changes extension settings.
  * @param msg, the .sendMessage from the background script
  */
 browser.runtime.onMessage.addListener((msg) => {
 	if (msg.type === "modeChanged") {
-		console.log("[Equality Compass] Mode changed — reprocessing all visible spans");
+		console.log("[Equality Compass] Display setting changed — reprocessing all visible spans");
 		// Unmark all previously processed spans
 		document.querySelectorAll('[data-processed="true"]').forEach(el => {
 			el.removeAttribute("data-processed");
@@ -73,7 +73,7 @@ const observer = new MutationObserver((mutations) => {
 		for (const node of mutation.addedNodes) {
 			if (!(node instanceof HTMLElement)) continue; // Skip non-element nodes
 			if (window.location.href.includes("linkedin.com")) {
-				if (window.location.href.includes("linkedin.com.jobs/*")){ // Jobs search
+				if (window.location.href.includes("linkedin.com/jobs/search")){ // Jobs search
 					// Check if the node itself or its descendants match our target linkedin span
 					const spans = node.matches?.('span[dir="ltr"]')
 						? [node] // Node is directly the target span
@@ -176,7 +176,7 @@ function applyIndeedColoring() {
  */
 function applyLinkedinColoring() {
 	let locationSpans = document.querySelectorAll('.artdeco-entity-lockup__caption span[dir="ltr"]'); // Identifier class
-	if (window.location.href.includes("linkedin.com.jobs/*")){ // Jobs search
+	if (window.location.href.includes("linkedin.com/jobs/search")){ // Jobs search
 		spanWalker(locationSpans);
 	}
 	else { // Jobs page
@@ -199,21 +199,17 @@ function applyZiprecruiterColoring() {
 //============================================================================
 
 function findFirstMatchingState(span, mode) {
-  const states = window.stateScores[mode];
+	const states = window.stateScores[mode];
 
-  for (const key of Object.keys(states)) {
-    const regex = new RegExp(`\\b${key}\\b`, 'i'); // match whole word, case-insensitive
-    const match = span.match(regex);
+	for (const key of Object.keys(states)) {
+		const regex = new RegExp(`\\b${key}\\b`, 'i'); // match whole word, case-insensitive
+		const match = span.match(regex);
 
-    if (match) {
-      const { colorGrade, score } = states[key];
-      return {
-        match: match[0],
-        index: match.index,
-        colorGrade,
-        score
-      };
-    }
+	if (match) {
+		const { colorGrade, score } = states[key];
+		return { match: match[0], index: match.index,
+				colorGrade, score };
+	}
   }
 
   // No match found
