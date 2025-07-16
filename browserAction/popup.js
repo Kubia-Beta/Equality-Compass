@@ -51,6 +51,10 @@ tooltipToggle.addEventListener("change", () => {
 //============================================================================
 // Dynamic popup logic
 //============================================================================
+
+/**
+ * Changes popup.html tooltips when called based on the current mode (Overall/GI).
+ */
 async function processPopupTooltips(){
 	const { mode = "OverallTally"} = await browser.storage.local.get(["mode"]);
 	const scoreValues = scoreBreakpoints[mode];
@@ -62,13 +66,14 @@ async function processPopupTooltips(){
 	});
 }
 
+// Holds the scores designated by the Movement Advancement Project as thresholds for their different tiers.
 const scoreBreakpoints = {
 	OverallTally: {
-		"high": "\u2265 36.75",
+		"high": "\u2265 36.75", // Greater than or equal to unicode character code
 		"medium": "\u2265 24.5",
 		"fair": "\u2265 12.25",
 		"low": "\u2265 0",
-		"negative": "\u003C 0"
+		"negative": "\u003C 0" // Less than unicode character code
 	},
 
 	GenderIdentityTally: {
