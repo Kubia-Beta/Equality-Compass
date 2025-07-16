@@ -8,9 +8,8 @@
 	  "48": "icons/icon48.png"
   },
   "background": {
-	"scripts": [
-		"background.js"
-	]
+	"scripts": ["background.js"],
+	"type": "module"
   },
   "content_scripts": [
     {

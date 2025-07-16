@@ -2,6 +2,7 @@
  * This background script is responsible for keeping settings in sync across tabs.
  * Triggers content.js listeners when detecting new local information storage.
  */
+import './lib/browser-polyfill.js';
 
 function reprocessTabs(){
 	browser.tabs.query({ url: "*://*.linkedin.com/jobs*" }).then(sendMessageToTabs);
