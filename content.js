@@ -47,7 +47,7 @@ else if (window.location.hostname.includes("ziprecruiter.com")) {
  */
 browser.runtime.onMessage.addListener((msg) => {
 	if (msg.type === "modeChanged") {
-		console.log("[Equality Compass] Mode changed — reprocessing all visible spans");
+		console.log("[Equality Compass] Display setting changed — reprocessing all visible spans");
 		// Unmark all previously processed spans
 		document.querySelectorAll('[data-processed="true"]').forEach(el => {
 			el.removeAttribute("data-processed");
@@ -73,8 +73,9 @@ const observer = new MutationObserver((mutations) => {
 		for (const node of mutation.addedNodes) {
 			if (!(node instanceof HTMLElement)) continue; // Skip non-element nodes
 			if (window.location.href.includes("linkedin.com")) {
-				if (window.location.href.includes("linkedin.com.jobs/*")){ // Jobs search
+				if (window.location.href.includes("linkedin.com/jobs/search")){ // Jobs search
 					// Check if the node itself or its descendants match our target linkedin span
+					console.log("A");
 					const spans = node.matches?.('span[dir="ltr"]')
 						? [node] // Node is directly the target span
 						: node.querySelectorAll?.('span[dir="ltr"]') || []; // Or search inside it
@@ -88,6 +89,7 @@ const observer = new MutationObserver((mutations) => {
 						}
 					});
 				} else { // Not a job Search
+					console.log("B");
 					const spans = node.matches?.('div[dir="ltr"')
 						? [node] 
 						: node.querySelectorAll?.('div[dir="ltr"') || []; 
