@@ -1,6 +1,6 @@
 /**
- * This content drives the logic behind the "popup" or "addon" menu,
- * and is responsible for storing and retrieving relevent addon settings.
+ * This content drives the logic behind the "popup" or "extension" menu,
+ * and is responsible for storing and retrieving relevent extension settings.
  * Triggers background.js listeners when storing local information.
  */
  

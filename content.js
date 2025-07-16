@@ -42,7 +42,7 @@ else if (window.location.hostname.includes("ziprecruiter.com")) {
 //============================================================================
 
 /**
- * Locally listen for messages from the background script to reprocess locations when the user changes addon settings.
+ * Locally listen for messages from the background script to reprocess locations when the user changes extension settings.
  * @param msg, the .sendMessage from the background script
  */
 browser.runtime.onMessage.addListener((msg) => {
