@@ -10,15 +10,13 @@ Works by searching for specific spans and divs that each respective website uses
 + No use of innerHTML, the locations are processed as plaintext using textContent. When inserted, it is not executed as code, avoiding most XSS attempts (if LinkedIn is putting XSS attacks as location data, we have bigger issues).
 + Styling, Tooltips, and Location data are all hardcoded to prevent injection.
 + No remote code, everything is local to the machine.
++ Only "outside" code is WebExtension browser API Polyfill, made by Mozilla, the org behind Firefox.
 
 # FAQ
-> Where is the Chrome version?
-
-Planned. I want to be more release-ready before I port this over to Chrome as well. It's my first Chrome extension, so I have to pay a fee.
 
 > When will this release?
 
-Full release should be done by the end of 2025. I lack the funding to really get behind any project at the moment, so I appreciate [Ko-Fi](https://ko-fi.com/Q5Q41GXDPM) donations a ton.
+Full release should be done by the end of July 2025. I lack the funding to really get behind any project at the moment, so I appreciate [Ko-Fi](https://ko-fi.com/Q5Q41GXDPM) donations a ton.
 
 > Why make this extension?
 
