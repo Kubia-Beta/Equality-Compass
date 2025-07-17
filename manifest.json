@@ -1,16 +1,15 @@
 {
   "manifest_version": 3,
   "name": "Equality Compass",
-  "version": "0.21.1",
+  "version": "0.22.0",
   "description": "Highlight states on LinkedIn and Indeed job listings with M.A.P. Total Policy Tally or Gender Identity scoring.",
   "icons": {
 	  "96": "icons/icon96.png",
 	  "48": "icons/icon48.png"
   },
   "background": {
-	"scripts": [
-		"background.js"
-	]
+	"scripts": ["background.js"],
+	"type": "module"
   },
   "content_scripts": [
     {
