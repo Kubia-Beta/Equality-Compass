@@ -4,12 +4,12 @@ An extension that scans job sites in the U.S. and assigns them a color based on 
 # Installation
 
 ## Firefox
-To install this development build for Firefox, download this release. Once you have the ZIP file, navigate to about:addons (or puzzle piece->manage extensions) and select the cog wheel with the option "install add-on from file", and select the ZIP file. Alternatively, navigate to [about:debugging#/runtime/this-firefox](about:debugging#/runtime/this-firefox), select "Temporary Extensions", and load this as a temporary addon by selecting the ZIP.
+To install this development build for Firefox, download this release. Once you have the ZIP file, navigate to the URL [about:debugging#/runtime/this-firefox](about:debugging#/runtime/this-firefox), select "Temporary Extensions", and load this as a temporary addon by selecting the ZIP.
 
 ## Chrome
-To install this development build for Chrome, download this release and unzip the contents to a folder you can access. Navigate to [chrome://extensions](chrome://extensions) (or three dots->manage->extensions). Turn on Developer mode in the top right, select "Load unpacked", and then select the extracted file folder.
+To install this development build for Chrome, download this release and unzip the contents to a folder you can access. Navigate to the URL [chrome://extensions](chrome://extensions) (or three dots->manage->extensions). Turn on Developer mode in the top right, select "Load unpacked", and then select the extracted file folder.
 
-##Note
+### Note
 
 These will not automatically update, as they have not been obtained from the platform's respective extension/addon pages. Once they are available on the respective storefronts, automatic updates and easier installation will be supported, allowing you to download and install them normally.
 
@@ -27,7 +27,7 @@ Works by searching for specific spans and divs that each respective website uses
 
 > When will this release?
 
-Full release should be done by the end of July 2025. I lack the funding to really get behind any project at the moment, so I appreciate [Ko-Fi](https://ko-fi.com/Q5Q41GXDPM) donations a ton.
+Full release should be done by the end of July 2025. I lack the funding to really get behind any project at the moment, so I appreciate [Ko-Fi](https://ko-fi.com/Q5Q41GXDPM) tips a ton.
 
 > Why make this extension?
 
