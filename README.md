@@ -1,6 +1,9 @@
 # Equality-Compass
 An extension that scans job sites in the U.S. and assigns them a color based on the Movement Advancement Project’s score for LGBTQ+ rights within that state to allow LGBTQ+ folk to make more informed decisions on job applications.
 
+<p align = center><img width="603" height="329" alt="Screenshot 2025-07-20 at 15-15-01 (19) Jobs LinkedIn" src="https://github.com/user-attachments/assets/733a18b9-e6a0-4373-8665-44c082021b71" /></p>
+<p align = center><img width="338" height="285" alt="Screenshot 2025-07-20 at 15-49-56 1 000 Jobs (NOW HIRING) in Seattle WA - ZipRecruiter" src="https://github.com/user-attachments/assets/cc433319-b298-4fc0-9572-bf8ac33955de" /></p>
+
 # Installation
 
 ## Firefox
