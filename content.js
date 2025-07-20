@@ -73,11 +73,12 @@ const observer = new MutationObserver((mutations) => {
 		for (const node of mutation.addedNodes) {
 			if (!(node instanceof HTMLElement)) continue; // Skip non-element nodes
 			if (window.location.href.includes("linkedin.com")) {
-				if (window.location.href.includes("linkedin.com/jobs/search")){ // Jobs search
+				const basicJobsPageSizeMax = 33;
+				if (window.location.href.length > basicJobsPageSizeMax){ // Jobs search
 					// Check if the node itself or its descendants match our target linkedin span
-					const spans = node.matches?.('span[dir="ltr"]')
+					const spans = node.is?.('[dir="ltr"]')
 						? [node] // Node is directly the target span
-						: node.querySelectorAll?.('span[dir="ltr"]') || []; // Or search inside it
+						: node.querySelectorAll?.('[dir="ltr"]') || []; // Or search inside it
 
 					spans.forEach(span => {
 						// Only handle spans within job location components
@@ -88,9 +89,9 @@ const observer = new MutationObserver((mutations) => {
 						}
 					});
 				} else { // Not a job Search
-					const spans = node.matches?.('div[dir="ltr"')
+					const spans = node.is?.('[dir="ltr"]')
 						? [node] 
-						: node.querySelectorAll?.('div[dir="ltr"') || []; 
+						: node.querySelectorAll?.('[dir="ltr"]') || []; 
 						
 					spans.forEach(span => {
 						const parent = span.closest('.artdeco-entity-lockup__subtitle');
@@ -102,7 +103,7 @@ const observer = new MutationObserver((mutations) => {
 				}
 			}
 			else if (window.location.href.includes("ziprecruiter")){
-				const spans = node.matches?.("[data-testid='job-card-location']")
+				const spans = node.is?.("[data-testid='job-card-location']")
 					? [node] 
 					: node.querySelectorAll?.("[data-testid='job-card-location']") || [];
 					
@@ -176,11 +177,14 @@ function applyIndeedColoring() {
  */
 function applyLinkedinColoring() {
 	let locationSpans = document.querySelectorAll('.artdeco-entity-lockup__caption span[dir="ltr"]'); // Identifier class
-	if (window.location.href.includes("linkedin.com/jobs/search")){ // Jobs search
+	const basicJobsPageSizeMax = 33;
+	if (window.location.href.length > basicJobsPageSizeMax){ // Jobs search or collections
 		spanWalker(locationSpans);
 	}
 	else { // Jobs page
 		locationSpans = document.querySelectorAll('.artdeco-entity-lockup__subtitle div[dir="ltr"]');
+		spanWalker(locationSpans);
+		locationSpans = document.querySelectorAll('.artdeco-entity-lockup__subtitle span[dir="ltr"]');
 		spanWalker(locationSpans);
 	}
 }
