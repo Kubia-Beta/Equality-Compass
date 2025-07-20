@@ -4,23 +4,23 @@ An extension that scans job sites in the U.S. and assigns them a color based on 
 # Installation
 
 ## Firefox
-To install this development build for Firefox, download this release. Once you have the ZIP file, navigate to the URL [about:debugging#/runtime/this-firefox](about:debugging#/runtime/this-firefox), select "Temporary Extensions", and load this as a temporary addon by selecting the ZIP.
+To install this development build for Firefox, [download the latest release](https://github.com/Kubia-Beta/Equality-Compass/releases/latest). Once you have the ZIP file, navigate to the URL [about:debugging#/runtime/this-firefox](about:debugging#/runtime/this-firefox), select "Temporary Extensions", and load this as a temporary addon by selecting the ZIP.
 
 ## Chrome
-To install this development build for Chrome, download this release and unzip the contents to a folder you can access. Navigate to the URL [chrome://extensions](chrome://extensions) (or three dots->manage->extensions). Turn on Developer mode in the top right, select "Load unpacked", and then select the extracted file folder.
+To install this development build for Chrome, [download the latest release](https://github.com/Kubia-Beta/Equality-Compass/releases/latest) and unzip the contents to a folder you can access. Navigate to the URL [chrome://extensions](chrome://extensions) (or three dots->manage->extensions). Turn on Developer mode in the top right, select "Load unpacked", and then select the extracted file folder.
 
-### Note
+## Note
 
 These will not automatically update, as they have not been obtained from the platform's respective extension/addon pages. Once they are available on the respective storefronts, automatic updates and easier installation will be supported, allowing you to download and install them normally.
 
 
 # Advanced Information
-Works by searching for specific spans and divs that each respective website uses to hold the location information of their job listings. A window of the state information runs in the background for the regex to pull matches from, which then get passed on to the span processing functions to remove the original text and reconstruct it but with the state on a colored background.
+Works by searching for specific spans and divs that each respective website uses to hold the location information of their job listings. A window of the state information runs in the background for the regex to pull matches from, which then get passed on to the span processing functions to remove the original text and reconstruct it, but with the state on a colored background.
 
 + I do not store or use any of your data in any way.
 + No use of innerHTML, the locations are processed as plaintext using textContent. When inserted, it is not executed as code, avoiding XSS.
-+ Styling, Tooltips, and Location data are all hardcoded to prevent injection.
-+ No remote code, everything is local to the machine you're running the extension with.
++ Styling, Tooltips, and location data are all hardcoded to prevent injection.
++ No remote code, everything is local to the machine you're running the extension on.
 + Only third-party code is WebExtension browser API Polyfill, made by Mozilla, the org behind Firefox.
 
 # FAQ
