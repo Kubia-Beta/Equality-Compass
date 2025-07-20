@@ -12,10 +12,6 @@ To install this development build for Firefox, [download the latest release](htt
 ## Chrome
 To install this development build for Chrome, [download the latest release](https://github.com/Kubia-Beta/Equality-Compass/releases/latest) and unzip the contents to a folder you can access. Navigate to the URL [chrome://extensions](chrome://extensions) (or three dots->manage->extensions). Turn on Developer mode in the top right, select "Load unpacked", and then select the extracted file folder.
 
-## Note
-
-These will not automatically update, as they have not been obtained from the platform's respective extension/addon pages. Once they are available on the respective storefronts, automatic updates and easier installation will be supported, allowing you to download and install them normally.
-
 
 # Advanced Information
 Works by searching for specific spans and divs that each respective website uses to hold the location information of their job listings. A window of the state information runs in the background for the regex to pull matches from, which then get passed on to the span processing functions to remove the original text and reconstruct it, but with the state on a colored background.
@@ -35,3 +31,11 @@ Full release should be done by the end of July 2025. I lack the funding to reall
 > Why make this extension?
 
 The inability of people to exist legally in some states while in public motivated the creation of this extension.
+
+> When will automatic updates come?
+
+At extension release. Currently, I'd have to self-sign this using the same storefronts that I am intending to upload to.
+
+> Why can't I just install this normally?
+
+Because it is an in-development extension, and so is not signed by either platform.
