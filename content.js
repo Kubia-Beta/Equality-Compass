@@ -77,7 +77,6 @@ const observer = new MutationObserver((mutations) => {
 				const LinkedInLocationSelectors = `
 				.artdeco-entity-lockup__caption,
 				.job-card-container__metadata-wrapper,
-				[class*=" _"],
 				[data-view-name*="job-card"]`;
 				
 				// Check if the node itself or its descendants match our target linkedin span
@@ -200,25 +199,6 @@ function applyZiprecruiterColoring() {
 // Parsing and Coloring logic
 //============================================================================
 
-function findFirstMatchingState(span, mode) {
-	const states = window.stateScores[mode];
-
-	for (const key of Object.keys(states)) {
-		const regex = new RegExp(`\\b${key}\\b`, 'i'); // match whole word, case-insensitive
-		const match = span.match(regex);
-
-	if (match) {
-		const { colorGrade, score } = states[key];
-		return { match: match[0], index: match.index,
-				colorGrade, score };
-	}
-  }
-
-  // No match found
-  return null;
-}
-
-
 /**
  * Processes a span into a matching state and surrounding text using a regular expression.
  * @param originalText, the text object we are trying to process
@@ -238,6 +218,7 @@ function processLocation(originalText, mode){
 		if (match) {
 			stateCandidate = match[0];
 			stateLocation = match.index;
+			break;
 		}
 	}
 	
