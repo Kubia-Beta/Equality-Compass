@@ -73,34 +73,32 @@ const observer = new MutationObserver((mutations) => {
 		for (const node of mutation.addedNodes) {
 			if (!(node instanceof HTMLElement)) continue; // Skip non-element nodes
 			if (window.location.href.includes("linkedin.com")) {
-				const basicJobsPageSizeMax = 33;
-				if (window.location.href.length > basicJobsPageSizeMax){ // Jobs search
-					// Check if the node itself or its descendants match our target linkedin span
-					const spans = node.is?.('[dir="ltr"]')
-						? [node] // Node is directly the target span
-						: node.querySelectorAll?.('[dir="ltr"]') || []; // Or search inside it
-
-					spans.forEach(span => {
+				
+				const LinkedInLocationSelectors = `
+				.artdeco-entity-lockup__caption,
+				.job-card-container__metadata-wrapper,
+				[class*=" _"],
+				[data-view-name*="job-card"]`;
+				
+				// Check if the node itself or its descendants match our target linkedin span
+				const spans = node.matches?.(LinkedInLocationSelectors)
+					? [node] // Node is directly the target span
+					: node.querySelectorAll?.(LinkedInLocationSelectors) || []; // Or search inside it
+					
+				spans.forEach(span => {
 						// Only handle spans within job location components
-						const parent = span.closest('.artdeco-entity-lockup__caption');
-						if (parent && !span.dataset.processed) {
+						const isValidParent =
+						span.closest('.artdeco-entity-lockup__caption') ||
+						span.closest('.job-card-container__metadata-wrapper') ||
+						span.closest('[data-view-name="job-card]');
+						
+						if (!isValidParent) return;
+						
+						if (!span.dataset.processed) {
 						span.dataset.processed = "true"; // Mark as processed
 						processSpan(span); // Apply highlighting
 						}
-					});
-				} else { // Not a job Search
-					const spans = node.is?.('[dir="ltr"]')
-						? [node] 
-						: node.querySelectorAll?.('[dir="ltr"]') || []; 
-						
-					spans.forEach(span => {
-						const parent = span.closest('.artdeco-entity-lockup__subtitle');
-						if (parent && !span.dataset.processed) {
-						span.dataset.processed = "true";
-						processSpan(span);
-						}
-					});
-				}
+				});
 			}
 			else if (window.location.href.includes("ziprecruiter")){
 				const spans = node.is?.("[data-testid='job-card-location']")
@@ -182,7 +180,7 @@ function applyLinkedinColoring() {
 		spanWalker(locationSpans);
 	}
 	else { // Jobs page
-		locationSpans = document.querySelectorAll('.artdeco-entity-lockup__subtitle div[dir="ltr"]');
+		locationSpans = document.querySelectorAll('.artdeco-entity-lockup__subtitle div[dir="ltr"]'); // [data-view-name*="job-card"
 		spanWalker(locationSpans);
 		locationSpans = document.querySelectorAll('.artdeco-entity-lockup__subtitle span[dir="ltr"]');
 		spanWalker(locationSpans);
