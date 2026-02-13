@@ -26,7 +26,7 @@ Works by searching for specific spans and divs that each respective website uses
 
 > When will this release?
 
-Full release should be done by the end of 2025. I lack the funding to really get behind any project at the moment, so I appreciate [Ko-Fi](https://ko-fi.com/Q5Q41GXDPM) tips a ton.
+I lack the funding to really get behind any project at the moment, so I appreciate [Ko-Fi](https://ko-fi.com/Q5Q41GXDPM) tips a ton.
 
 > Why make this extension?
 
