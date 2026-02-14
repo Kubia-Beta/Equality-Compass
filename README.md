@@ -39,3 +39,5 @@ At extension release. Currently, I'd have to self-sign this using the same store
 > Why can't I just install this normally?
 
 Because it is an in-development extension, and so is not signed by either platform.
+
+Icon Illustration by [Round Icons](https://unsplash.com/@roundicons/illustrations)
