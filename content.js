@@ -75,9 +75,9 @@ const observer = new MutationObserver((mutations) => {
 			if (window.location.href.includes("linkedin.com")) {
 				// Observer logic differs from standard coloring to obtain matches
 				// Check if the node itself or its descendants match our target linkedin span
-				const spans = node.matches?.(fetchLinkedinSelectors())
+				const spans = node.matches?.(fetchLinkedInSelectors())
 					? [node] // Node is directly the target span
-					: node.querySelectorAll?.(fetchLinkedinSelectors()) || []; // Or search inside it
+					: node.querySelectorAll?.(fetchLinkedInSelectors()) || []; // Or search inside it
 					
 				walkLinkeinNode(spans);
 			}
@@ -149,10 +149,10 @@ function applyIndeedColoring() {
 
 
 /**
- * Returns a list of the selectors used for .matches in Linkedin searches
- * @return { precedingText , stateCandidate, trailingText }, an object containing the processed location parts.
+ * Returns a list of the selectors used for .matches in LinkedIn searches
+ * @return selectors for LinkedIn.
  */
-function fetchLinkedinSelectors() {
+function fetchLinkedInSelectors() {
 	return LinkedInLocationSelectors =
 	`.artdeco-entity-lockup__caption,
 	.job-card-container__metadata-wrapper`;
@@ -163,9 +163,9 @@ function fetchLinkedinSelectors() {
  */
 function applyLinkedinColoring() {
 	// Check if the node itself or its descendants match our target linkedin span
-	const spans = document.matches?.(fetchLinkedinSelectors())
+	const spans = document.matches?.(fetchLinkedInSelectors())
 		? [document] // Node is directly the target span
-		: document.querySelectorAll?.(fetchLinkedinSelectors()) || []; // Or search inside it
+		: document.querySelectorAll?.(fetchLinkedInSelectors()) || []; // Or search inside it
 		
 	walkLinkeinNode(spans);
 }
