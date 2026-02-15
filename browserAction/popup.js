@@ -77,9 +77,9 @@ const scoreBreakpoints = {
 	},
 
 	GenderIdentityTally: {
-		"high": "\u2265 19.5",
-		"medium": "\u2265 13",
-		"fair": "\u2265 6",
+		"high": "\u2265 17.25",
+		"medium": "\u2265 11.5",
+		"fair": "\u2265 5.75",
 		"low": "\u2265 0",
 		"negative": "\u003C 0"
 	}
