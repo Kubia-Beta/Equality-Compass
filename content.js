@@ -154,8 +154,8 @@ function applyIndeedColoring() {
  */
 function fetchLinkedInSelectors() {
 	return LinkedInLocationSelectors =
-	`.artdeco-entity-lockup__caption,
-	.job-card-container__metadata-wrapper`;
+	`.artdeco-entity-lockup__caption`,
+	`.job-card-container__metadata-wrapper`;
 }
 
 /**
