@@ -73,31 +73,13 @@ const observer = new MutationObserver((mutations) => {
 		for (const node of mutation.addedNodes) {
 			if (!(node instanceof HTMLElement)) continue; // Skip non-element nodes
 			if (window.location.href.includes("linkedin.com")) {
-				
-				const LinkedInLocationSelectors = `
-				.artdeco-entity-lockup__caption,
-				.job-card-container__metadata-wrapper,
-				[data-view-name*="job-card"]`;
-				
+				// Observer logic differs from standard coloring to obtain matches
 				// Check if the node itself or its descendants match our target linkedin span
-				const spans = node.matches?.(LinkedInLocationSelectors)
+				const spans = node.matches?.(fetchLinkedinSelectors())
 					? [node] // Node is directly the target span
-					: node.querySelectorAll?.(LinkedInLocationSelectors) || []; // Or search inside it
+					: node.querySelectorAll?.(fetchLinkedinSelectors()) || []; // Or search inside it
 					
-				spans.forEach(span => {
-						// Only handle spans within job location components
-						const isValidParent =
-						span.closest('.artdeco-entity-lockup__caption') ||
-						span.closest('.job-card-container__metadata-wrapper') ||
-						span.closest('[data-view-name="job-card]');
-						
-						if (!isValidParent) return;
-						
-						if (!span.dataset.processed) {
-						span.dataset.processed = "true"; // Mark as processed
-						processSpan(span); // Apply highlighting
-						}
-				});
+				walkLinkeinNode(spans);
 			}
 			else if (window.location.href.includes("ziprecruiter")){
 				const spans = node.is?.("[data-testid='job-card-location']")
@@ -107,10 +89,7 @@ const observer = new MutationObserver((mutations) => {
 				setTimeout(function(){ // Delay to prevent the highlighted span from popping in and out during SPA changes
 					spans.forEach(span => { // ZipRecruiter dynamically changes the page multiple times when you click a job
 						const parent = span.closest("[data-testid='job-card-location']");
-						if (parent && !span.dataset.processed) {
-						span.dataset.processed = "true";
-						processSpan(span);
-						}
+						spanWalker(spans);
 					})
 				}, 200);
 			}
@@ -170,22 +149,44 @@ function applyIndeedColoring() {
 
 
 /**
+ * Returns a list of the selectors used for .matches in Linkedin searches
+ * @return { precedingText , stateCandidate, trailingText }, an object containing the processed location parts.
+ */
+function fetchLinkedinSelectors() {
+	return LinkedInLocationSelectors =
+	`.artdeco-entity-lockup__caption,
+	.job-card-container__metadata-wrapper`;
+}
+
+/**
  * Recolors all visible job listing location spans on the page on LinkedIn.
  */
 function applyLinkedinColoring() {
-	let locationSpans = document.querySelectorAll('.artdeco-entity-lockup__caption span[dir="ltr"]'); // Identifier class
-	const basicJobsPageSizeMax = 33;
-	if (window.location.href.length > basicJobsPageSizeMax){ // Jobs search or collections
-		spanWalker(locationSpans);
-	}
-	else { // Jobs page
-		locationSpans = document.querySelectorAll('.artdeco-entity-lockup__subtitle div[dir="ltr"]'); // [data-view-name*="job-card"
-		spanWalker(locationSpans);
-		locationSpans = document.querySelectorAll('.artdeco-entity-lockup__subtitle span[dir="ltr"]');
-		spanWalker(locationSpans);
-	}
+	// Check if the node itself or its descendants match our target linkedin span
+	const spans = document.matches?.(fetchLinkedinSelectors())
+		? [document] // Node is directly the target span
+		: document.querySelectorAll?.(fetchLinkedinSelectors()) || []; // Or search inside it
+		
+	walkLinkeinNode(spans);
 }
 
+
+/**
+ * Walks each node for LinkedIn using specific search criteria
+ * @param spans, the spans already obtained to sieve
+ */
+function walkLinkeinNode(spans) {
+	spans.forEach(span => {
+		// Only handle spans within job location components
+		const isValidParent =
+		span.closest('.artdeco-entity-lockup__caption') ||
+		span.closest('.job-card-container__metadata-wrapper');
+		
+		if (!isValidParent) return;
+		
+		spanWalker(spans);
+	});
+}
 
 /**
  * Recolors all visible job listing location spans on the page on Ziprecruiter.
@@ -210,7 +211,7 @@ function processLocation(originalText, mode){
 	let stateCandidate = "";
 	
 	// Sort the keys from stateScores.js to match abbreviations first
-	const sortedKeys = Object.keys(states).sort((a, b) => b.length - a.length);
+	const sortedKeys = Object.keys(states);
 	
 	for (const key of sortedKeys) {
 		const regex = new RegExp(`\\b${key}\\b`); // match whole word
